@@ -1,0 +1,857 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="한국어">
+<meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0C0C10" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%235B54E8'/%3E%3Ctext x='90' y='118' font-size='84' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E%ED%95%9C%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+<title>한국어 카드 — 韓国語単語カード</title>
+
+<style>
+:root{
+  --bg:#F1F3F7; --card:#FFFFFF; --raise:#FFFFFF; --sunk:#E9ECF3;
+  --text:#101521; --sub:#697086; --line:#DDE2EC;
+  --accent:#0B4FA8; --accent-ink:#FFFFFF; --accent-soft:#E2EBF9;
+  --ok:#0E8A55; --ok-soft:#E0F2E9; --no:#C8102E; --no-soft:#FBE6EA; --star:#C98A16;
+  --shadow:0 1px 2px rgba(16,21,33,.05), 0 10px 28px rgba(16,21,33,.07);
+  --radius:18px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0A0D14; --card:#151A24; --raise:#1D2430; --sunk:#0F141D;
+    --text:#EDF1F7; --sub:#8D97AC; --line:#28303D;
+    --accent:#78ABF5; --accent-ink:#08111F; --accent-soft:#16263D;
+    --ok:#4ECB8E; --ok-soft:#10291D; --no:#FF7285; --no-soft:#2E1319; --star:#E5B33D;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px rgba(0,0,0,.45);
+  }
+}
+:root[data-theme="light"]{
+  --bg:#F1F3F7; --card:#FFFFFF; --raise:#FFFFFF; --sunk:#E9ECF3;
+  --text:#101521; --sub:#697086; --line:#DDE2EC;
+  --accent:#0B4FA8; --accent-ink:#FFFFFF; --accent-soft:#E2EBF9;
+  --ok:#0E8A55; --ok-soft:#E0F2E9; --no:#C8102E; --no-soft:#FBE6EA; --star:#C98A16;
+  --shadow:0 1px 2px rgba(16,21,33,.05), 0 10px 28px rgba(16,21,33,.07);
+}
+:root[data-theme="dark"]{
+  --bg:#0A0D14; --card:#151A24; --raise:#1D2430; --sunk:#0F141D;
+  --text:#EDF1F7; --sub:#8D97AC; --line:#28303D;
+  --accent:#78ABF5; --accent-ink:#08111F; --accent-soft:#16263D;
+  --ok:#4ECB8E; --ok-soft:#10291D; --no:#FF7285; --no-soft:#2E1319; --star:#E5B33D;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px rgba(0,0,0,.45);
+}
+
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Apple SD Gothic Neo","Hiragino Sans","Noto Sans JP",sans-serif;
+  -webkit-font-smoothing:antialiased; overscroll-behavior-y:none;
+}
+button{font:inherit; color:inherit; background:none; border:none; padding:0; cursor:pointer}
+button:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:8px}
+h1,h2,h3{margin:0; font-weight:700}
+.num{font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important} }
+
+.ic{width:1em; height:1em; display:inline-block; vertical-align:-.14em; flex:none}
+.ic.fill{fill:currentColor}
+
+.app{max-width:640px; margin:0 auto; padding:0 16px calc(84px + env(safe-area-inset-bottom))}
+.top{
+  position:sticky; top:0; z-index:5; background:var(--bg);
+  padding:calc(10px + env(safe-area-inset-top)) 0 10px;
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+}
+.top h1{font-size:20px; letter-spacing:.01em}
+.top .sub{font-size:12px; color:var(--sub); font-weight:500; margin-top:2px}
+.streak{
+  display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700;
+  background:var(--raise); border:1px solid var(--line); border-radius:999px; padding:7px 13px;
+}
+.streak .ic{font-size:15px; color:var(--star)}
+.streak.zero .ic{color:var(--sub); opacity:.5}
+
+section.view{display:none; animation:fade .18s ease}
+section.view.on{display:block}
+@keyframes fade{from{opacity:0; transform:translateY(4px)} to{opacity:1; transform:none}}
+
+.panel{background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:16px; margin-bottom:14px}
+.panel h2{font-size:12px; color:var(--sub); font-weight:700; margin-bottom:13px; letter-spacing:.06em; text-transform:uppercase}
+
+.bar{display:flex; height:10px; border-radius:999px; overflow:hidden; background:var(--sunk); margin-bottom:11px}
+.bar i{display:block; height:100%; transition:width .4s ease}
+.legend{display:flex; gap:16px; flex-wrap:wrap; font-size:12px; color:var(--sub)}
+.legend span{display:flex; align-items:center; gap:6px}
+.legend b{color:var(--text); font-variant-numeric:tabular-nums}
+.dot{width:8px; height:8px; border-radius:50%; display:inline-block; flex:none}
+
+.review{background:var(--accent); color:var(--accent-ink); border-radius:var(--radius); padding:18px; margin-bottom:14px; box-shadow:var(--shadow)}
+.review .lbl{font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; opacity:.75}
+.review .n{font-size:38px; font-weight:800; line-height:1.15; margin-top:4px; font-variant-numeric:tabular-nums}
+.review .n small{font-size:15px; font-weight:600; margin-left:3px}
+.review button{
+  width:100%; margin-top:14px; background:color-mix(in srgb, var(--accent-ink) 16%, transparent);
+  border:1px solid color-mix(in srgb, var(--accent-ink) 34%, transparent);
+  color:var(--accent-ink); padding:13px; border-radius:12px; font-weight:700; font-size:15px;
+}
+.review button:disabled{opacity:.6}
+
+.modes{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+.mode{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:15px 14px; text-align:left; box-shadow:var(--shadow)}
+.mode .ic{font-size:23px; color:var(--accent); margin-bottom:9px}
+.mode .t{font-weight:700; font-size:15px; display:block}
+.mode .d{font-size:11.5px; color:var(--sub); margin-top:4px; line-height:1.5}
+.mode:active{transform:scale(.98)}
+.mode:disabled{opacity:.4}
+
+.chips{display:flex; flex-wrap:wrap; gap:7px}
+.chip{border:1px solid var(--line); background:var(--raise); border-radius:999px; padding:7px 13px; font-size:13px; font-weight:600; color:var(--sub)}
+.chip.on{background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
+.chip.lite.on{background:var(--accent-soft); color:var(--accent); border-color:var(--accent)}
+.rowbtns{display:flex; gap:8px; margin-bottom:11px}
+.rowbtns button{font-size:12px; font-weight:700; color:var(--accent); padding:5px 11px; border:1px solid var(--line); border-radius:999px}
+
+.field{display:flex; align-items:center; justify-content:space-between; padding:13px 0; border-bottom:1px solid var(--line); gap:12px}
+.field:first-of-type{padding-top:0}
+.field:last-child{border-bottom:none; padding-bottom:0}
+.field .k{font-size:14.5px; font-weight:600}
+.field .h{font-size:11.5px; color:var(--sub); margin-top:3px; line-height:1.45}
+.seg{display:flex; background:var(--sunk); border-radius:10px; padding:3px; gap:2px; flex:none}
+.seg button{padding:7px 9px; border-radius:8px; font-size:12.5px; font-weight:600; color:var(--sub); white-space:nowrap}
+.seg button.on{background:var(--card); color:var(--text); box-shadow:0 1px 3px rgba(0,0,0,.14)}
+.sw{width:50px; height:30px; border-radius:999px; background:var(--line); position:relative; transition:background .18s; flex:none}
+.sw::after{content:""; position:absolute; top:3px; left:3px; width:24px; height:24px; border-radius:50%; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.25); transition:transform .18s}
+.sw.on{background:var(--ok)} .sw.on::after{transform:translateX(20px)}
+
+.btn{display:block; width:100%; padding:14px; border-radius:13px; font-weight:700; font-size:15px; text-align:center}
+.btn.p{background:var(--accent); color:var(--accent-ink)}
+.btn.g{background:var(--raise); border:1px solid var(--line)}
+.btn.d{color:var(--no); background:var(--no-soft)}
+.btn+.btn{margin-top:9px}
+
+.search{width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--line); background:var(--card); color:var(--text); font-size:16px; margin-bottom:11px}
+.search::placeholder{color:var(--sub)}
+.wlist{background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden}
+.w{display:flex; align-items:center; gap:10px; padding:12px 14px; border-bottom:1px solid var(--line)}
+.w:last-child{border-bottom:none}
+.w .txt{flex:1; min-width:0}
+.w .ko{font-size:16px; font-weight:700; letter-spacing:-.01em}
+.w .ja{font-size:12.5px; color:var(--sub); margin-top:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.w .act{font-size:19px; padding:6px 3px; color:var(--sub); flex:none}
+.w .act.st.on{color:var(--star)}
+.tag{font-size:10px; font-weight:700; color:var(--sub); background:var(--sunk); border-radius:5px; padding:2px 5px; margin-left:7px; vertical-align:2px; letter-spacing:0}
+.empty{text-align:center; color:var(--sub); font-size:13.5px; padding:34px 10px; line-height:1.8}
+
+.tabbar{
+  position:fixed; left:0; right:0; bottom:0; z-index:10;
+  display:flex; background:color-mix(in srgb, var(--card) 86%, transparent);
+  -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px);
+  border-top:1px solid var(--line); padding-bottom:env(safe-area-inset-bottom);
+}
+.tabbar button{flex:1; padding:9px 0 7px; display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--sub); font-size:10.5px; font-weight:600}
+.tabbar button .ic{font-size:21px}
+.tabbar button.on{color:var(--accent)}
+
+/* ===== session ===== */
+.session{
+  position:fixed; inset:0; z-index:50; background:var(--bg);
+  display:flex; flex-direction:column;
+  padding:calc(8px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom));
+}
+.session[hidden]{display:none}
+.shead{display:flex; align-items:center; gap:13px; margin-bottom:12px}
+.shead .x{font-size:20px; width:40px; height:40px; margin-left:-4px; border-radius:50%; display:grid; place-items:center; color:var(--sub)}
+.shead .x:active{background:var(--sunk)}
+.pbar{flex:1; height:6px; background:var(--sunk); border-radius:999px; overflow:hidden}
+.pbar i{display:block; height:100%; background:var(--accent); border-radius:999px; transition:width .25s}
+.shead .cnt{font-size:12.5px; color:var(--sub); font-weight:700; font-variant-numeric:tabular-nums; min-width:54px; text-align:right}
+
+.stage{flex:1; display:flex; align-items:center; justify-content:center; position:relative; padding:6px 0}
+.flip{
+  width:100%; height:100%; max-height:440px; background:var(--card); border-radius:24px; box-shadow:var(--shadow);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
+  padding:26px 22px; position:relative; touch-action:pan-y; user-select:none; -webkit-user-select:none;
+}
+.flip .tools{position:absolute; top:12px; left:12px; right:12px; display:flex; justify-content:space-between}
+.flip .tools button{width:38px; height:38px; border-radius:50%; display:grid; place-items:center; font-size:19px; background:var(--sunk); color:var(--sub)}
+.flip .tools button.on{color:var(--star)}
+.flip .lesson{position:absolute; bottom:15px; font-size:11px; color:var(--sub); font-weight:600; letter-spacing:.02em}
+.face{max-width:100%}
+.face .big{font-size:38px; font-weight:800; line-height:1.32; word-break:break-word; letter-spacing:-.015em; text-wrap:balance}
+.face .big.ja{font-size:29px; font-weight:700}
+.face .sm{font-size:17px; color:var(--sub); margin-top:15px; line-height:1.55; font-weight:500; text-wrap:balance}
+.face .hint{font-size:11.5px; color:var(--sub); margin-top:22px; opacity:.8}
+.playbig{width:112px; height:112px; border-radius:50%; background:var(--accent-soft); color:var(--accent); font-size:42px; display:grid; place-items:center; margin:0 auto}
+.playbig.on{animation:pulse .7s ease}
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.09)}100%{transform:scale(1)}}
+.judge{position:absolute; top:20px; font-size:15px; font-weight:800; padding:7px 15px; border-radius:10px; opacity:0}
+.judge.l{left:20px; color:var(--no); background:var(--no-soft); transform:rotate(-9deg)}
+.judge.r{right:20px; color:var(--ok); background:var(--ok-soft); transform:rotate(9deg)}
+
+.answers{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px}
+.answers button{padding:17px 10px; border-radius:15px; font-weight:800; font-size:16px}
+.answers .ng{background:var(--no-soft); color:var(--no)}
+.answers .okb{background:var(--ok-soft); color:var(--ok)}
+.answers button:active{transform:scale(.97)}
+
+.result{text-align:center; padding:10px 0}
+.ring{width:132px; height:132px; margin:0 auto 6px; position:relative}
+.ring svg{width:100%; height:100%; transform:rotate(-90deg)}
+.ring circle{fill:none; stroke-width:9; stroke-linecap:round}
+.ring .track{stroke:var(--sunk)}
+.ring .val{stroke:var(--ok); transition:stroke-dashoffset .7s ease}
+.ring .pct{position:absolute; inset:0; display:grid; place-items:center}
+.ring .pct b{font-size:31px; font-weight:800; font-variant-numeric:tabular-nums; letter-spacing:-.02em}
+.ring .pct span{font-size:15px; font-weight:600; color:var(--sub); margin-left:2px}
+.result h2{font-size:21px; margin:14px 0 6px}
+.result .score{font-size:13.5px; color:var(--sub); margin-bottom:20px}
+.result .nums{display:flex; justify-content:center; gap:30px; margin:0 0 24px}
+.result .nums div{text-align:center}
+.result .nums b{display:block; font-size:29px; font-weight:800; font-variant-numeric:tabular-nums}
+.result .nums span{font-size:11.5px; color:var(--sub); font-weight:600}
+
+/* ===== modal ===== */
+.modal{
+  position:fixed; inset:0; z-index:100; display:flex; align-items:flex-end; justify-content:center;
+  background:rgba(8,12,20,.45); -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px);
+  padding:16px; padding-bottom:calc(16px + env(safe-area-inset-bottom));
+  animation:fade .16s ease;
+}
+.modal[hidden]{display:none}
+.sheet{
+  width:100%; max-width:420px; background:var(--card); border-radius:20px; padding:22px 18px 18px;
+  box-shadow:var(--shadow); animation:rise .22s cubic-bezier(.2,.8,.3,1);
+}
+@keyframes rise{from{transform:translateY(14px); opacity:.6} to{transform:none; opacity:1}}
+.sheet .mtext{font-size:15px; line-height:1.65; text-align:center; margin-bottom:18px; white-space:pre-line}
+@media (min-width:520px){ .modal{align-items:center} }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<symbol id="i-cards" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="12.5" height="14" rx="2.4"/><path d="M8.5 3.5h9A3 3 0 0 1 20.5 6.5v10"/></symbol>
+<symbol id="i-audio" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15.5v-3.7a8 8 0 0 1 16 0v3.7"/><rect x="2" y="14" width="4.6" height="7" rx="2.3"/><rect x="17.4" y="14" width="4.6" height="7" rx="2.3"/></symbol>
+<symbol id="i-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.6"/><circle cx="12" cy="12" r="4.4"/><circle cx="12" cy="12" r=".9" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11.5M9 12h11.5M9 18h11.5"/><circle cx="4.3" cy="6" r="1.35" fill="currentColor" stroke="none"/><circle cx="4.3" cy="12" r="1.35" fill="currentColor" stroke="none"/><circle cx="4.3" cy="18" r="1.35" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-sliders" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h9M17.5 8H21M3 16h4.5M13 16h8"/><circle cx="14.6" cy="8" r="2.6"/><circle cx="10.1" cy="16" r="2.6"/></symbol>
+<symbol id="i-speaker" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11.5 4.5 6.8 8.7H3.2v6.6h3.6l4.7 4.2z"/><path d="M15.6 9.2a4 4 0 0 1 0 5.6"/><path d="M18.4 6.2a8 8 0 0 1 0 11.6"/></symbol>
+<symbol id="i-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3.7 2.62 5.32 5.88.86-4.25 4.14 1 5.85L12 17.32 6.75 19.87l1-5.85L3.5 9.88l5.88-.86z"/></symbol>
+<symbol id="i-flame" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12.6 2.2c.3 3.5-.5 5.4-1.7 6.6-.9-.5-1.2-1.5-1.2-2.7C8 7.6 6.4 9.7 6.4 12.6c0 3.4 2.6 6 5.6 6s5.6-2.6 5.6-6c0-4.4-3-8-5-10.4Zm-.6 14.3c-1.3 0-2.3-1-2.3-2.4 0-1.2.7-2 1.6-3 .2.8.6 1.3 1.2 1.7.9.6 1.8 1 1.8 2.2 0 .8-1 1.5-2.3 1.5Z"/></symbol>
+<symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M6 6 18 18M18 6 6 18"/></symbol>
+</defs></svg>
+
+<div class="app">
+  <div class="top">
+    <div>
+      <h1>한국어 카드</h1>
+      <div class="sub" id="subtitle">韓国語単語カード</div>
+    </div>
+    <div class="streak zero" id="streak"></div>
+  </div>
+
+  <!-- ========== 学習 ========== -->
+  <section class="view on" id="v-study">
+    <div class="review">
+      <div class="lbl">今日の復習</div>
+      <div class="n"><span id="dueN">0</span><small>語</small></div>
+      <button id="startReview">復習を始める</button>
+    </div>
+
+    <div class="panel">
+      <h2>学習モード</h2>
+      <div class="modes">
+        <button class="mode" data-mode="cards">
+          <svg class="ic"><use href="#i-cards"/></svg>
+          <span class="t">単語カード</span>
+          <span class="d">タップでめくって<br>「覚えた／まだ」に仕分け</span>
+        </button>
+        <button class="mode" data-mode="listen">
+          <svg class="ic"><use href="#i-audio"/></svg>
+          <span class="t">聞き取り</span>
+          <span class="d">音声だけを聞いて<br>意味を思い出す</span>
+        </button>
+      </div>
+      <div style="font-size:11.5px;color:var(--sub);margin-top:12px;text-align:center" id="poolInfo">—</div>
+    </div>
+
+    <div class="panel">
+      <h2>進捗</h2>
+      <div class="bar">
+        <i id="pgDone" style="background:var(--ok)"></i>
+        <i id="pgLearn" style="background:var(--star)"></i>
+        <i id="pgNew" style="background:var(--sunk)"></i>
+      </div>
+      <div class="legend">
+        <span><i class="dot" style="background:var(--ok)"></i>習得済み <b id="cDone">0</b></span>
+        <span><i class="dot" style="background:var(--star)"></i>学習中 <b id="cLearn">0</b></span>
+        <span><i class="dot" style="background:var(--line)"></i>未学習 <b id="cNew">0</b></span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>出題範囲 — 課</h2>
+      <div class="rowbtns">
+        <button id="lsAll">すべて</button>
+        <button id="lsNone">解除</button>
+      </div>
+      <div class="chips" id="lessonChips"></div>
+    </div>
+
+    <div class="panel">
+      <h2>出題範囲 — 品詞</h2>
+      <div class="chips" id="posChips"></div>
+      <div class="field" style="margin-top:14px;border-top:1px solid var(--line);padding-top:13px">
+        <div><div class="k">スターを付けた語だけ</div><div class="h">苦手な語だけを集中的に復習します</div></div>
+        <button class="sw" id="swStar"></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 単語 ========== -->
+  <section class="view" id="v-list">
+    <input class="search" id="q" placeholder="韓国語・日本語で検索" autocomplete="off">
+    <div class="chips" style="margin-bottom:12px">
+      <button class="chip lite on" data-lf="all">全課</button>
+      <button class="chip lite" data-lf="star">スターのみ</button>
+      <button class="chip lite" data-lf="learn">学習中</button>
+      <button class="chip lite" data-lf="done">習得済み</button>
+      <button class="chip lite" data-lf="new">未学習</button>
+    </div>
+    <div class="wlist" id="wlist"></div>
+    <button class="btn g" id="more" style="margin-top:12px" hidden></button>
+  </section>
+
+  <!-- ========== 設定 ========== -->
+  <section class="view" id="v-set">
+    <div class="panel">
+      <h2>出題</h2>
+      <div class="field">
+        <div><div class="k">1回の枚数</div><div class="h">1ラウンドで出す枚数</div></div>
+        <div class="seg" id="segRound">
+          <button data-v="10">10</button><button data-v="20">20</button>
+          <button data-v="30">30</button><button data-v="50">50</button>
+        </div>
+      </div>
+      <div class="field">
+        <div><div class="k">出題の向き</div><div class="h">単語カードで最初に見せる面</div></div>
+        <div class="seg" id="segDir">
+          <button data-v="mix">両方</button><button data-v="k">韓→日</button><button data-v="j">日→韓</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>音声</h2>
+      <div class="field">
+        <div><div class="k">読み上げ速度</div><div class="h">韓国語の発音スピード</div></div>
+        <div class="seg" id="segRate">
+          <button data-v="0.6">ゆっくり</button><button data-v="0.85">ふつう</button><button data-v="1">速い</button>
+        </div>
+      </div>
+      <div class="field">
+        <div><div class="k">自動で読み上げ</div><div class="h">韓国語が表示されたら自動で再生</div></div>
+        <button class="sw" id="swAuto"></button>
+      </div>
+      <div class="field">
+        <div><div class="k">音声テスト</div><div class="h" id="voiceInfo">—</div></div>
+        <button class="chip" id="testVoice">안녕하세요</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>見た目</h2>
+      <div class="field">
+        <div><div class="k">テーマ</div><div class="h">端末の設定に合わせるか、固定するか</div></div>
+        <div class="seg" id="segTheme">
+          <button data-v="auto">自動</button><button data-v="light">明るい</button><button data-v="dark">暗い</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>データ</h2>
+      <div style="font-size:12.5px;color:var(--sub);line-height:1.75;margin-bottom:13px" id="dataInfo">—</div>
+      <button class="btn g" id="backup">進捗をバックアップ（書き出し）</button>
+      <button class="btn g" id="restore">バックアップから復元</button>
+      <input type="file" id="fileIn" accept="application/json,.json" hidden>
+      <button class="btn d" id="reset" style="margin-top:16px">進捗をすべてリセット</button>
+    </div>
+    <div style="text-align:center;font-size:11px;color:var(--sub);padding:2px 0 10px">
+      進捗はこの端末のブラウザ内に保存されます
+    </div>
+  </section>
+
+  <nav class="tabbar">
+    <button data-tab="v-study" class="on"><svg class="ic"><use href="#i-target"/></svg>学習</button>
+    <button data-tab="v-list"><svg class="ic"><use href="#i-book"/></svg>単語</button>
+    <button data-tab="v-set"><svg class="ic"><use href="#i-sliders"/></svg>設定</button>
+  </nav>
+</div>
+
+<!-- ========== 学習セッション ========== -->
+<div class="session" id="session" hidden>
+  <div class="shead">
+    <button class="x" id="sClose" aria-label="終了"><svg class="ic"><use href="#i-close"/></svg></button>
+    <div class="pbar"><i id="sBar" style="width:0"></i></div>
+    <div class="cnt" id="sCnt">0/0</div>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="flip" id="flip">
+      <div class="tools">
+        <button id="sStar" aria-label="スター"><svg class="ic"><use href="#i-star"/></svg></button>
+        <button id="sSpeak" aria-label="読み上げ"><svg class="ic"><use href="#i-speaker"/></svg></button>
+      </div>
+      <div class="judge l" id="jL">まだ</div>
+      <div class="judge r" id="jR">覚えた</div>
+      <div class="face" id="face"></div>
+      <div class="lesson" id="sLesson"></div>
+    </div>
+  </div>
+
+  <div class="answers" id="answers">
+    <button class="ng" id="bNg">まだ</button>
+    <button class="okb" id="bOk">覚えた</button>
+  </div>
+</div>
+
+<!-- ========== 確認ダイアログ ========== -->
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true">
+  <div class="sheet">
+    <div class="mtext" id="mText"></div>
+    <button class="btn p" id="mYes">OK</button>
+    <button class="btn g" id="mNo">キャンセル</button>
+  </div>
+</div>
+
+<script>
+const WORDS = [{"i":0,"k":"네","j":"はい（柔らかな印象）","m":"","p":"その他","l":1},{"i":1,"k":"반가워요","j":"お会いできてうれしいです（打ち解けた形）","m":"表現","p":"表現","l":1},{"i":2,"k":"반갑습니다","j":"お会いできてうれしいです","m":"表現","p":"表現","l":1},{"i":3,"k":"뵙겠습니다","j":"目にかかります","m":"表現","p":"表現","l":1},{"i":4,"k":"아뇨","j":"いいえ（会話での縮約形）","m":"","p":"その他","l":1},{"i":5,"k":"아니요","j":"いいえ","m":"表現","p":"表現","l":1},{"i":6,"k":"아이","j":"子供","m":"名","p":"名詞","l":1},{"i":7,"k":"안녕하세요?","j":"こんにちは（お元気ですか？）","m":"表現","p":"表現","l":1},{"i":8,"k":"에","j":"～に","m":"助詞","p":"助詞","l":1},{"i":9,"k":"여우","j":"キツネ","m":"名","p":"名詞","l":1},{"i":10,"k":"여유","j":"余裕","m":"名","p":"名詞","l":1},{"i":11,"k":"예","j":"はい（フォーマルな印象）","m":"名","p":"名詞","l":1},{"i":12,"k":"오이","j":"キュウリ","m":"名","p":"名詞","l":1},{"i":13,"k":"우유","j":"牛乳","m":"名","p":"名詞","l":1},{"i":14,"k":"이","j":"この","m":"名","p":"名詞","l":1},{"i":15,"k":"이유","j":"理由","m":"名","p":"名詞","l":1},{"i":16,"k":"잘 부탁합니다","j":"よろしくお願いします","m":"表現","p":"表現","l":1},{"i":17,"k":"저는 ...입니다","j":"私は...です","m":"表現","p":"表現","l":1},{"i":18,"k":"제 이름은 ...입니다","j":"私の名前は...です","m":"表現","p":"表現","l":1},{"i":19,"k":"처음","j":"はじめ","m":"名","p":"名詞","l":1},{"i":20,"k":"처음 뵙겠습니다","j":"はじめまして","m":"表現","p":"表現","l":1},{"i":21,"k":"가구","j":"家具","m":"名","p":"名詞","l":2},{"i":22,"k":"가사","j":"歌詞","m":"名","p":"名詞","l":2},{"i":23,"k":"감사합니다","j":"ありがとうございます","m":"表現","p":"表現","l":2},{"i":24,"k":"거기","j":"そこ","m":"名","p":"名詞","l":2},{"i":25,"k":"고기","j":"肉","m":"名","p":"名詞","l":2},{"i":26,"k":"고마워요","j":"ありがとう（親しみのある形）","m":"表現","p":"表現","l":2},{"i":27,"k":"고맙습니다","j":"ありがとうございます","m":"表現","p":"表現","l":2},{"i":28,"k":"기다리다","j":"待つ","m":"動","p":"動詞","l":2},{"i":29,"k":"나","j":"わたし（ぼく、おれ）","m":"名","p":"名詞","l":2},{"i":30,"k":"나라","j":"国","m":"名","p":"名詞","l":2},{"i":31,"k":"너","j":"あなた（きみ、おまえ）","m":"名","p":"名詞","l":2},{"i":32,"k":"누구","j":"誰","m":"名","p":"名詞","l":2},{"i":33,"k":"누나","j":"（弟から見た）姉","m":"名","p":"名詞","l":2},{"i":34,"k":"도서","j":"図書","m":"名","p":"名詞","l":2},{"i":35,"k":"두부","j":"豆腐","m":"名","p":"名詞","l":2},{"i":36,"k":"또 오세요","j":"また来てください","m":"表現","p":"表現","l":2},{"i":37,"k":"미래","j":"未来","m":"名","p":"名詞","l":2},{"i":38,"k":"버스","j":"バス","m":"名","p":"名詞","l":2},{"i":39,"k":"부부","j":"夫婦","m":"名","p":"名詞","l":2},{"i":40,"k":"아버지","j":"父","m":"名","p":"名詞","l":2},{"i":41,"k":"안녕히 가세요","j":"さようなら（去る人に対して）","m":"表現","p":"表現","l":2},{"i":42,"k":"안녕히 계세요","j":"さようなら（残る人に対して）","m":"表現","p":"表現","l":2},{"i":43,"k":"어디","j":"どこ","m":"名","p":"名詞","l":2},{"i":44,"k":"어머니","j":"母","m":"名","p":"名詞","l":2},{"i":45,"k":"어서 오세요","j":"いらっしゃいませ／どうぞお入りください","m":"表現","p":"表現","l":2},{"i":46,"k":"여기","j":"ここ","m":"名","p":"名詞","l":2},{"i":47,"k":"여기요","j":"すみません（呼びかけ）／これです","m":"表現","p":"表現","l":2},{"i":48,"k":"여보세요","j":"もしもし","m":"表現","p":"表現","l":2},{"i":49,"k":"여자","j":"女","m":"名","p":"名詞","l":2},{"i":50,"k":"우리","j":"私たち","m":"名","p":"名詞","l":2},{"i":51,"k":"이거","j":"これ（口語）","m":"名","p":"名詞","l":2},{"i":52,"k":"이거 하나 주세요","j":"これ一つください","m":"表現","p":"表現","l":2},{"i":53,"k":"자리","j":"席","m":"名","p":"名詞","l":2},{"i":54,"k":"자주","j":"よく、頻繁に","m":"副","p":"副詞","l":2},{"i":55,"k":"저기","j":"あそこ","m":"名","p":"名詞","l":2},{"i":56,"k":"저기요","j":"あの、すみません（呼び止め）","m":"表現","p":"表現","l":2},{"i":57,"k":"하나","j":"ひとつ","m":"名","p":"名詞","l":2},{"i":58,"k":"과자","j":"菓子","m":"名","p":"名詞","l":3},{"i":59,"k":"그때","j":"その時","m":"名","p":"名詞","l":3},{"i":60,"k":"나의 하루","j":"私の一日","m":"表現","p":"表現","l":3},{"i":61,"k":"뒤","j":"後ろ","m":"名","p":"名詞","l":3},{"i":62,"k":"또 만나요","j":"また会いましょう","m":"表現","p":"表現","l":3},{"i":63,"k":"모르다","j":"わからない、知らない","m":"動","p":"動詞","l":3},{"i":64,"k":"뭐","j":"なに","m":"名","p":"名詞","l":3},{"i":65,"k":"바빠요","j":"忙しいです","m":"形活用","p":"形容詞","l":3},{"i":66,"k":"비싸요","j":"（値段が）高いです","m":"形活用","p":"形容詞","l":3},{"i":67,"k":"스웨터","j":"セーター","m":"名","p":"名詞","l":3},{"i":68,"k":"스포츠","j":"スポーツ","m":"名","p":"名詞","l":3},{"i":69,"k":"아까","j":"さっき","m":"副","p":"副詞","l":3},{"i":70,"k":"안녕!","j":"元気でね、バイバイ！","m":"表現","p":"表現","l":3},{"i":71,"k":"안녕?","j":"元気？","m":"表現","p":"表現","l":3},{"i":72,"k":"알겠습니까?","j":"わかりましたか？","m":"表現","p":"表現","l":3},{"i":73,"k":"알겠습니다","j":"わかりました","m":"表現","p":"表現","l":3},{"i":74,"k":"알다","j":"知る、わかる","m":"動","p":"動詞","l":3},{"i":75,"k":"예의","j":"礼儀","m":"名","p":"名詞","l":3},{"i":76,"k":"왜요?","j":"なぜですか？","m":"表現","p":"表現","l":3},{"i":77,"k":"의자","j":"椅子","m":"名","p":"名詞","l":3},{"i":78,"k":"잘 듣고 따라 하세요","j":"よく聞いて真似してください","m":"表現","p":"表現","l":3},{"i":79,"k":"잘 모르겠습니다","j":"よくわかりません","m":"表現","p":"表現","l":3},{"i":80,"k":"잘했어요!","j":"よくできました！","m":"表現","p":"表現","l":3},{"i":81,"k":"찌개","j":"チゲ","m":"名","p":"名詞","l":3},{"i":82,"k":"커피","j":"コーヒー","m":"名","p":"名詞","l":3},{"i":83,"k":"타요","j":"乗ります","m":"動活用","p":"動詞","l":3},{"i":84,"k":"하루","j":"いちにち","m":"名","p":"名詞","l":3},{"i":85,"k":"회사","j":"会社","m":"名","p":"名詞","l":3},{"i":86,"k":"같아요","j":"同じです","m":"形活用","p":"形容詞","l":4},{"i":87,"k":"계산","j":"計算","m":"名","p":"名詞","l":4},{"i":88,"k":"고양이","j":"猫","m":"名","p":"名詞","l":4},{"i":89,"k":"넓다","j":"広い","m":"形","p":"形容詞","l":4},{"i":90,"k":"높아요","j":"高いです","m":"形活用","p":"形容詞","l":4},{"i":91,"k":"마음","j":"心、気持ち","m":"名","p":"名詞","l":4},{"i":92,"k":"맛있게 드세요","j":"おいしく召し上がってください","m":"表現","p":"表現","l":4},{"i":93,"k":"미국","j":"アメリカ","m":"名","p":"名詞","l":4},{"i":94,"k":"미안합니다","j":"ごめんなさい","m":"表現","p":"表現","l":4},{"i":95,"k":"미안해요","j":"ごめんね","m":"表現","p":"表現","l":4},{"i":96,"k":"밖","j":"外","m":"名","p":"名詞","l":4},{"i":97,"k":"받침","j":"パッチム","m":"名","p":"名詞","l":4},{"i":98,"k":"밝아요","j":"明るいです","m":"形活用","p":"形容詞","l":4},{"i":99,"k":"밟다","j":"踏む","m":"動","p":"動詞","l":4},{"i":100,"k":"밥","j":"ご飯","m":"名","p":"名詞","l":4},{"i":101,"k":"생일","j":"誕生日","m":"名","p":"名詞","l":4},{"i":102,"k":"생일 축하해요","j":"誕生日おめでとうございます","m":"表現","p":"表現","l":4},{"i":103,"k":"선물","j":"プレゼント","m":"名","p":"名詞","l":4},{"i":104,"k":"씨","j":"～さん","m":"名","p":"名詞","l":4},{"i":105,"k":"안녕","j":"元気？／バイバイ","m":"表現","p":"表現","l":4},{"i":106,"k":"앉다","j":"座る","m":"動","p":"動詞","l":4},{"i":107,"k":"앉아요","j":"座ります","m":"動活用","p":"動詞","l":4},{"i":108,"k":"않다","j":"～しない（否定）","m":"補助動詞","p":"動詞","l":4},{"i":109,"k":"알아요","j":"知っています","m":"形活用","p":"形容詞","l":4},{"i":110,"k":"약속","j":"約束","m":"名","p":"名詞","l":4},{"i":111,"k":"얼마","j":"いくら","m":"名","p":"名詞","l":4},{"i":112,"k":"없다","j":"ない、いない","m":"存","p":"その他","l":4},{"i":113,"k":"영어","j":"英語","m":"名","p":"名詞","l":4},{"i":114,"k":"오늘","j":"今日","m":"名","p":"名詞","l":4},{"i":115,"k":"오랜만이에요","j":"お久しぶりです","m":"表現","p":"表現","l":4},{"i":116,"k":"옷","j":"服","m":"名","p":"名詞","l":4},{"i":117,"k":"와!","j":"わあ！","m":"感","p":"表現","l":4},{"i":118,"k":"음악","j":"音楽","m":"名","p":"名詞","l":4},{"i":119,"k":"일본","j":"日本","m":"名","p":"名詞","l":4},{"i":120,"k":"일본어","j":"日本語","m":"名","p":"名詞","l":4},{"i":121,"k":"읽다","j":"読む","m":"動","p":"動詞","l":4},{"i":122,"k":"읽어요","j":"読みます","m":"動活用","p":"動詞","l":4},{"i":123,"k":"잃다","j":"なくす","m":"動","p":"動詞","l":4},{"i":124,"k":"있어요","j":"あります、います","m":"存活用","p":"その他","l":4},{"i":125,"k":"잘 먹겠습니다","j":"いただきます","m":"表現","p":"表現","l":4},{"i":126,"k":"잘 먹었습니다","j":"ごちそうさまでした","m":"表現","p":"表現","l":4},{"i":127,"k":"잘 지냈어요?","j":"お元気でしたか？","m":"表現","p":"表現","l":4},{"i":128,"k":"젊다","j":"若い","m":"形","p":"形容詞","l":4},{"i":129,"k":"죄송합니다","j":"申し訳ありません","m":"表現","p":"表現","l":4},{"i":130,"k":"축하해요","j":"おめでとうございます","m":"表現","p":"表現","l":4},{"i":131,"k":"한국","j":"韓国","m":"名","p":"名詞","l":4},{"i":132,"k":"한국어","j":"韓国語","m":"名","p":"名詞","l":4},{"i":133,"k":"가나자와","j":"金沢","m":"名","p":"名詞","l":5},{"i":134,"k":"거짓말","j":"嘘","m":"名","p":"名詞","l":5},{"i":135,"k":"결혼","j":"結婚","m":"名","p":"名詞","l":5},{"i":136,"k":"괜찮아요","j":"大丈夫です","m":"形活用","p":"形容詞","l":5},{"i":137,"k":"괜찮아요?","j":"大丈夫ですか？","m":"表現","p":"表現","l":5},{"i":138,"k":"군마","j":"群馬","m":"名","p":"名詞","l":5},{"i":139,"k":"그렇다","j":"そうだ","m":"形","p":"形容詞","l":5},{"i":140,"k":"꽃말","j":"花言葉","m":"名","p":"名詞","l":5},{"i":141,"k":"남동생","j":"弟","m":"名","p":"名詞","l":5},{"i":142,"k":"남학생","j":"男子学生","m":"名","p":"名詞","l":5},{"i":143,"k":"도쿄","j":"東京","m":"名","p":"名詞","l":5},{"i":144,"k":"동생","j":"年下の兄弟","m":"名","p":"名詞","l":5},{"i":145,"k":"드라이어","j":"ドライヤー","m":"名","p":"名詞","l":5},{"i":146,"k":"레이코","j":"令子","m":"名","p":"名詞","l":5},{"i":147,"k":"많다","j":"多い","m":"形","p":"形容詞","l":5},{"i":148,"k":"많이","j":"たくさん","m":"副","p":"副詞","l":5},{"i":149,"k":"맛있어요","j":"美味しいです","m":"表現","p":"表現","l":5},{"i":150,"k":"먹었어요","j":"食べました","m":"表現","p":"表現","l":5},{"i":151,"k":"못해요","j":"できません","m":"表現","p":"表現","l":5},{"i":152,"k":"박물관","j":"博物館","m":"名","p":"名詞","l":5},{"i":153,"k":"밥 먹었어요?","j":"ごはん、食べましたか？","m":"表現","p":"表現","l":5},{"i":154,"k":"백화점","j":"デパート","m":"名","p":"名詞","l":5},{"i":155,"k":"번호","j":"番号","m":"名","p":"名詞","l":5},{"i":156,"k":"삿포로","j":"札幌","m":"名","p":"名詞","l":5},{"i":157,"k":"성함","j":"お名前","m":"名","p":"名詞","l":5},{"i":158,"k":"센다이","j":"仙台","m":"名","p":"名詞","l":5},{"i":159,"k":"센터","j":"センター","m":"名","p":"名詞","l":5},{"i":160,"k":"수고하셨습니다","j":"お疲れ様でした","m":"表現","p":"表現","l":5},{"i":161,"k":"숙제","j":"宿題","m":"名","p":"名詞","l":5},{"i":162,"k":"싫어요","j":"嫌です","m":"形活用","p":"形容詞","l":5},{"i":163,"k":"아이치","j":"愛知","m":"名","p":"名詞","l":5},{"i":164,"k":"안 먹었어요","j":"食べていません","m":"表現","p":"表現","l":5},{"i":165,"k":"약하다","j":"弱い","m":"形","p":"形容詞","l":5},{"i":166,"k":"언니","j":"姉（妹から）","m":"名","p":"名詞","l":5},{"i":167,"k":"여동생","j":"妹","m":"名","p":"名詞","l":5},{"i":168,"k":"오빠","j":"兄（妹から）","m":"名","p":"名詞","l":5},{"i":169,"k":"오사카","j":"大阪","m":"名","p":"名詞","l":5},{"i":170,"k":"올해","j":"今年","m":"名","p":"名詞","l":5},{"i":171,"k":"은행","j":"銀行","m":"名","p":"名詞","l":5},{"i":172,"k":"입국","j":"入国","m":"名","p":"名詞","l":5},{"i":173,"k":"입니다","j":"～です","m":"","p":"その他","l":5},{"i":174,"k":"입문","j":"入門","m":"名","p":"名詞","l":5},{"i":175,"k":"입학","j":"入学","m":"名","p":"名詞","l":5},{"i":176,"k":"있는데","j":"いるけれど","m":"","p":"その他","l":5},{"i":177,"k":"있다","j":"ある、いる","m":"存","p":"その他","l":5},{"i":178,"k":"작년","j":"去年","m":"名","p":"名詞","l":5},{"i":179,"k":"전화","j":"電話","m":"名","p":"名詞","l":5},{"i":180,"k":"젓가락","j":"箸","m":"名","p":"名詞","l":5},{"i":181,"k":"좋다","j":"良い","m":"形","p":"形容詞","l":5},{"i":182,"k":"좋아요","j":"良いです","m":"形活用","p":"形容詞","l":5},{"i":183,"k":"지바","j":"千葉","m":"名","p":"名詞","l":5},{"i":184,"k":"큐슈","j":"九州","m":"名","p":"名詞","l":5},{"i":185,"k":"트윈","j":"ツイン","m":"名","p":"名詞","l":5},{"i":186,"k":"티켓","j":"チケット","m":"名","p":"名詞","l":5},{"i":187,"k":"학년","j":"学年","m":"名","p":"名詞","l":5},{"i":188,"k":"학번","j":"入学年度（学番）","m":"名","p":"名詞","l":5},{"i":189,"k":"형","j":"兄（弟から）","m":"名","p":"名詞","l":5},{"i":190,"k":"홋카이도","j":"北海道","m":"名","p":"名詞","l":5},{"i":191,"k":"교과서","j":"教科書","m":"名","p":"名詞","l":6},{"i":192,"k":"그","j":"その","m":"名","p":"名詞","l":6},{"i":193,"k":"그 친구","j":"その友達","m":"名","p":"名詞","l":6},{"i":194,"k":"그래요","j":"そうです","m":"表現","p":"表現","l":6},{"i":195,"k":"는","j":"～は","m":"助","p":"助詞","l":6},{"i":196,"k":"대학생","j":"大学生","m":"名","p":"名詞","l":6},{"i":197,"k":"도","j":"～も","m":"助","p":"助詞","l":6},{"i":198,"k":"도쿄 사람","j":"東京の人","m":"名","p":"名詞","l":6},{"i":199,"k":"부산 사람","j":"釜山の人","m":"名","p":"名詞","l":6},{"i":200,"k":"사사키 씨","j":"佐々木さん","m":"名","p":"名詞","l":6},{"i":201,"k":"사사키 씨 것","j":"佐々木さんの物","m":"名","p":"名詞","l":6},{"i":202,"k":"서울 사람","j":"ソウルの人","m":"名","p":"名詞","l":6},{"i":203,"k":"선배","j":"先輩","m":"名","p":"名詞","l":6},{"i":204,"k":"선생님","j":"先生","m":"名","p":"名詞","l":6},{"i":205,"k":"어느","j":"どの","m":"名","p":"名詞","l":6},{"i":206,"k":"어느 나라","j":"どの国","m":"名","p":"名詞","l":6},{"i":207,"k":"어느 나라 사람","j":"どの国の人","m":"名","p":"名詞","l":6},{"i":208,"k":"오사카 사람","j":"大阪の人","m":"名","p":"名詞","l":6},{"i":209,"k":"유학생","j":"留学生","m":"名","p":"名詞","l":6},{"i":210,"k":"은","j":"～は","m":"助","p":"助詞","l":6},{"i":211,"k":"이 사람","j":"この人","m":"名","p":"名詞","l":6},{"i":212,"k":"이것","j":"これ","m":"名","p":"名詞","l":6},{"i":213,"k":"이름","j":"名前","m":"名","p":"名詞","l":6},{"i":214,"k":"일본 사람","j":"日本人","m":"名","p":"名詞","l":6},{"i":215,"k":"자전거","j":"自転車","m":"名","p":"名詞","l":6},{"i":216,"k":"저","j":"あの, 私","m":"名","p":"名詞","l":6},{"i":217,"k":"저 책","j":"あの本","m":"名","p":"名詞","l":6},{"i":218,"k":"정말","j":"本当","m":"名","p":"名詞","l":6},{"i":219,"k":"제 이름","j":"私の名前","m":"名","p":"名詞","l":6},{"i":220,"k":"지하철","j":"地下鉄","m":"名","p":"名詞","l":6},{"i":221,"k":"집","j":"家","m":"名","p":"名詞","l":6},{"i":222,"k":"책","j":"本","m":"名","p":"名詞","l":6},{"i":223,"k":"친구","j":"友達","m":"名","p":"名詞","l":6},{"i":224,"k":"하고","j":"～と","m":"助","p":"助詞","l":6},{"i":225,"k":"학생","j":"学生","m":"名","p":"名詞","l":6},{"i":226,"k":"학생 식당","j":"学食","m":"名","p":"名詞","l":6},{"i":227,"k":"한국 사람","j":"韓国人","m":"名","p":"名詞","l":6},{"i":228,"k":"회사원","j":"会社員","m":"名","p":"名詞","l":6},{"i":229,"k":"후배","j":"後輩","m":"名","p":"名詞","l":6},{"i":230,"k":"-가 아니에요 / -이 아니에요","j":"～ではありません","m":"表現","p":"表現","l":7},{"i":231,"k":"가방","j":"カバン","m":"名","p":"名詞","l":7},{"i":232,"k":"가，이","j":"～が","m":"助","p":"助詞","l":7},{"i":233,"k":"공무원","j":"公務員","m":"名","p":"名詞","l":7},{"i":234,"k":"교사","j":"教師","m":"名","p":"名詞","l":7},{"i":235,"k":"교실","j":"教室","m":"名","p":"名詞","l":7},{"i":236,"k":"그거","j":"それ（口語）","m":"名","p":"名詞","l":7},{"i":237,"k":"그것","j":"それ","m":"名","p":"名詞","l":7},{"i":238,"k":"그것은 (그건)","j":"それは","m":"","p":"その他","l":7},{"i":239,"k":"그것이 (그게)","j":"それが","m":"","p":"その他","l":7},{"i":240,"k":"근처","j":"近く、近所","m":"名","p":"名詞","l":7},{"i":241,"k":"누가","j":"誰が","m":"名","p":"名詞","l":7},{"i":242,"k":"다나카 씨","j":"田中さん","m":"名","p":"名詞","l":7},{"i":243,"k":"모자","j":"帽子","m":"名","p":"名詞","l":7},{"i":244,"k":"밑","j":"下、底","m":"名","p":"名詞","l":7},{"i":245,"k":"방","j":"部屋","m":"名","p":"名詞","l":7},{"i":246,"k":"사무실","j":"事務室","m":"名","p":"名詞","l":7},{"i":247,"k":"사이","j":"間","m":"名","p":"名詞","l":7},{"i":248,"k":"속","j":"中、内部","m":"名","p":"名詞","l":7},{"i":249,"k":"수업","j":"授業","m":"名","p":"名詞","l":7},{"i":250,"k":"시간","j":"時間","m":"名","p":"名詞","l":7},{"i":251,"k":"식당","j":"食堂","m":"名","p":"名詞","l":7},{"i":252,"k":"아래","j":"下","m":"名","p":"名詞","l":7},{"i":253,"k":"아침","j":"朝","m":"名","p":"名詞","l":7},{"i":254,"k":"안","j":"中、内","m":"名","p":"名詞","l":7},{"i":255,"k":"앞","j":"前","m":"名","p":"名詞","l":7},{"i":256,"k":"어느 거","j":"どれ（口語）","m":"名","p":"名詞","l":7},{"i":257,"k":"어느 것","j":"どれ","m":"名","p":"名詞","l":7},{"i":258,"k":"어느 것이 (어느 게)","j":"どれが","m":"","p":"その他","l":7},{"i":259,"k":"없어요","j":"ありません","m":"","p":"その他","l":7},{"i":260,"k":"여보세요?","j":"もしもし","m":"表現","p":"表現","l":7},{"i":261,"k":"역","j":"駅","m":"名","p":"名詞","l":7},{"i":262,"k":"역 앞","j":"駅前","m":"","p":"その他","l":7},{"i":263,"k":"옆","j":"横","m":"名","p":"名詞","l":7},{"i":264,"k":"오른쪽","j":"右","m":"名","p":"名詞","l":7},{"i":265,"k":"오전","j":"午前","m":"名","p":"名詞","l":7},{"i":266,"k":"오쿠보 역","j":"大久保駅","m":"","p":"その他","l":7},{"i":267,"k":"왼쪽","j":"左","m":"名","p":"名詞","l":7},{"i":268,"k":"우체국","j":"郵便局","m":"名","p":"名詞","l":7},{"i":269,"k":"위","j":"上","m":"名","p":"名詞","l":7},{"i":270,"k":"의사","j":"医師","m":"名","p":"名詞","l":7},{"i":271,"k":"이것은 (이건)","j":"これは","m":"","p":"その他","l":7},{"i":272,"k":"이것이 (이게)","j":"これが","m":"","p":"その他","l":7},{"i":273,"k":"이름이 뭐예요?","j":"お名前は何ですか？","m":"表現","p":"表現","l":7},{"i":274,"k":"입구","j":"入口","m":"名","p":"名詞","l":7},{"i":275,"k":"저거","j":"あれ（口語）","m":"名","p":"名詞","l":7},{"i":276,"k":"저것","j":"あれ","m":"名","p":"名詞","l":7},{"i":277,"k":"저것은 (저건)","j":"あれは","m":"","p":"その他","l":7},{"i":278,"k":"저것이 (저게)","j":"あれが","m":"","p":"その他","l":7},{"i":279,"k":"정말이에요","j":"本当です","m":"表現","p":"表現","l":7},{"i":280,"k":"제가","j":"私が","m":"","p":"その他","l":7},{"i":281,"k":"주말","j":"週末","m":"名","p":"名詞","l":7},{"i":282,"k":"지금","j":"今","m":"名・副","p":"名詞","l":7},{"i":283,"k":"책상","j":"机","m":"名","p":"名詞","l":7},{"i":284,"k":"카페","j":"カフェ","m":"名","p":"名詞","l":7},{"i":285,"k":"편의점","j":"コンビニ","m":"名","p":"名詞","l":7},{"i":286,"k":"학교","j":"学校","m":"名","p":"名詞","l":7},{"i":287,"k":"한 시","j":"1時","m":"","p":"その他","l":7},{"i":288,"k":"해외","j":"海外","m":"名","p":"名詞","l":7},{"i":289,"k":"휴대폰","j":"携帯電話","m":"名","p":"名詞","l":7},{"i":290,"k":"가다","j":"行く","m":"動","p":"動詞","l":8},{"i":291,"k":"갈비","j":"カルビ","m":"名","p":"名詞","l":8},{"i":292,"k":"거기서","j":"そこで","m":"","p":"その他","l":8},{"i":293,"k":"공부하다","j":"勉強する","m":"動","p":"動詞","l":8},{"i":294,"k":"그래서","j":"それで、だから","m":"接続詞","p":"その他","l":8},{"i":295,"k":"그리고","j":"そして","m":"接続詞","p":"その他","l":8},{"i":296,"k":"김치","j":"キムチ","m":"名","p":"名詞","l":8},{"i":297,"k":"낫토","j":"納豆","m":"名","p":"名詞","l":8},{"i":298,"k":"노래","j":"歌","m":"名","p":"名詞","l":8},{"i":299,"k":"놀다","j":"遊ぶ","m":"動","p":"動詞","l":8},{"i":300,"k":"댄스","j":"ダンス","m":"名","p":"名詞","l":8},{"i":301,"k":"도서관","j":"図書館","m":"名","p":"名詞","l":8},{"i":302,"k":"도토로","j":"トトロ","m":"名","p":"名詞","l":8},{"i":303,"k":"드라마","j":"映画","m":"名","p":"名詞","l":8},{"i":304,"k":"듣다","j":"聞く","m":"動","p":"動詞","l":8},{"i":305,"k":"디즈니 애니메","j":"ディズニーアニメ","m":"名","p":"名詞","l":8},{"i":306,"k":"떡볶이","j":"トッポッキ","m":"名","p":"名詞","l":8},{"i":307,"k":"마시다","j":"飲む","m":"動","p":"動詞","l":8},{"i":308,"k":"만나다","j":"会う","m":"動","p":"動詞","l":8},{"i":309,"k":"만들다","j":"作る","m":"動","p":"動詞","l":8},{"i":310,"k":"먹다","j":"食べる","m":"動","p":"動詞","l":8},{"i":311,"k":"멀다","j":"遠い","m":"形","p":"形容詞","l":8},{"i":312,"k":"무엇","j":"何","m":"名","p":"名詞","l":8},{"i":313,"k":"보다","j":"見る","m":"動","p":"動詞","l":8},{"i":314,"k":"보통","j":"普段、普通","m":"名，副","p":"名詞","l":8},{"i":315,"k":"사다","j":"買う","m":"動","p":"動詞","l":8},{"i":316,"k":"생갈비","j":"生カルビ","m":"名","p":"名詞","l":8},{"i":317,"k":"쉬다","j":"休む","m":"動","p":"動詞","l":8},{"i":318,"k":"스시","j":"寿司","m":"名","p":"名詞","l":8},{"i":319,"k":"싫어하다","j":"嫌いだ","m":"動","p":"動詞","l":8},{"i":320,"k":"양념갈비","j":"味付きカルビ","m":"名","p":"名詞","l":8},{"i":321,"k":"어디서","j":"どこで","m":"","p":"その他","l":8},{"i":322,"k":"에서","j":"～で","m":"助","p":"助詞","l":8},{"i":323,"k":"여기서","j":"ここで","m":"","p":"その他","l":8},{"i":324,"k":"영화","j":"映画","m":"名","p":"名詞","l":8},{"i":325,"k":"오다","j":"来る","m":"動","p":"動詞","l":8},{"i":326,"k":"오후","j":"午後","m":"名","p":"名詞","l":8},{"i":327,"k":"일본 애니메","j":"日本のアニメ","m":"名","p":"名詞","l":8},{"i":328,"k":"일본 음식","j":"日本の食べ物","m":"名","p":"名詞","l":8},{"i":329,"k":"저기서","j":"あそこで","m":"","p":"その他","l":8},{"i":330,"k":"저녁","j":"夕方","m":"名","p":"名詞","l":8},{"i":331,"k":"점심","j":"昼食、お昼","m":"名","p":"名詞","l":8},{"i":332,"k":"좋아하다","j":"好きだ","m":"動","p":"動詞","l":8},{"i":333,"k":"지 않다","j":"～しない（後置否定）","m":"","p":"その他","l":8},{"i":334,"k":"지브리 애니메","j":"ジブリアニメ","m":"名","p":"名詞","l":8},{"i":335,"k":"특히","j":"特に","m":"副","p":"副詞","l":8},{"i":336,"k":"하다","j":"する","m":"動","p":"動詞","l":8},{"i":337,"k":"한국 드라마","j":"韓国ドラマ","m":"名","p":"名詞","l":8},{"i":338,"k":"한국 영화","j":"韓国映画","m":"名","p":"名詞","l":8},{"i":339,"k":"한국 요리","j":"韓国料理","m":"名","p":"名詞","l":8},{"i":340,"k":"한국 음식","j":"韓国の食べ物","m":"名","p":"名詞","l":8},{"i":341,"k":"호텔","j":"ホテル","m":"名","p":"名詞","l":8},{"i":342,"k":"개","j":"個","m":"名","p":"名詞","l":9},{"i":343,"k":"권","j":"冊","m":"名","p":"名詞","l":9},{"i":344,"k":"김밥","j":"キムパ","m":"名","p":"名詞","l":9},{"i":345,"k":"너무","j":"あまりにも、とても","m":"副","p":"副詞","l":9},{"i":346,"k":"네","j":"4（助数詞前）","m":"","p":"その他","l":9},{"i":347,"k":"네 개","j":"4個","m":"","p":"その他","l":9},{"i":348,"k":"네 시","j":"4時","m":"","p":"その他","l":9},{"i":349,"k":"다섯 개","j":"5個","m":"","p":"その他","l":9},{"i":350,"k":"다섯 시","j":"5時","m":"","p":"その他","l":9},{"i":351,"k":"다음","j":"次, 今度","m":"名","p":"名詞","l":9},{"i":352,"k":"대","j":"台","m":"名","p":"名詞","l":9},{"i":353,"k":"두","j":"2（助数詞前）","m":"","p":"その他","l":9},{"i":354,"k":"두 개","j":"2個","m":"","p":"その他","l":9},{"i":355,"k":"두 시","j":"2時","m":"","p":"その他","l":9},{"i":356,"k":"를","j":"～を（母音）","m":"助","p":"助詞","l":9},{"i":357,"k":"리포트","j":"レポート","m":"名","p":"名詞","l":9},{"i":358,"k":"마흔","j":"40，40歳","m":"名","p":"名詞","l":9},{"i":359,"k":"맛있게 드세요","j":"おいしく召し上がれ","m":"表現","p":"表現","l":9},{"i":360,"k":"몇 시","j":"何時","m":"","p":"その他","l":9},{"i":361,"k":"물","j":"水","m":"名","p":"名詞","l":9},{"i":362,"k":"밤","j":"夜","m":"名","p":"名詞","l":9},{"i":363,"k":"배우다","j":"習う","m":"動詞","p":"動詞","l":9},{"i":364,"k":"번","j":"回、度","m":"名","p":"名詞","l":9},{"i":365,"k":"비빔밥","j":"ビビンバ","m":"名","p":"名詞","l":9},{"i":366,"k":"빵","j":"パン","m":"名","p":"名詞","l":9},{"i":367,"k":"사람 / 명","j":"人 / 名","m":"名","p":"名詞","l":9},{"i":368,"k":"사진","j":"写真","m":"名","p":"名詞","l":9},{"i":369,"k":"살","j":"歳","m":"名","p":"名詞","l":9},{"i":370,"k":"새벽","j":"深夜・明け方","m":"名","p":"名詞","l":9},{"i":371,"k":"서른","j":"30，30歳","m":"名","p":"名詞","l":9},{"i":372,"k":"세","j":"3（助数詞前）","m":"","p":"その他","l":9},{"i":373,"k":"세 개","j":"3個","m":"","p":"その他","l":9},{"i":374,"k":"세 시","j":"3時","m":"","p":"その他","l":9},{"i":375,"k":"셀프","j":"セルフ","m":"名","p":"名詞","l":9},{"i":376,"k":"쉰","j":"50，50歳","m":"名","p":"名詞","l":9},{"i":377,"k":"스무","j":"20（助数詞前）","m":"","p":"その他","l":9},{"i":378,"k":"스물","j":"20, 二十歳","m":"名","p":"名詞","l":9},{"i":379,"k":"시","j":"時","m":"名","p":"名詞","l":9},{"i":380,"k":"아이스 아메리카노","j":"アイスアメリカーノ","m":"名","p":"名詞","l":9},{"i":381,"k":"아홉 개","j":"9個","m":"","p":"その他","l":9},{"i":382,"k":"아홉 시","j":"9時","m":"","p":"その他","l":9},{"i":383,"k":"아흔","j":"90，90歳","m":"名","p":"名詞","l":9},{"i":384,"k":"약","j":"薬","m":"名","p":"名詞","l":9},{"i":385,"k":"에이 포","j":"A4","m":"名","p":"名詞","l":9},{"i":386,"k":"여기요!","j":"すみません！","m":"表現","p":"表現","l":9},{"i":387,"k":"여덟 개","j":"8個","m":"","p":"その他","l":9},{"i":388,"k":"여덟 시","j":"8時","m":"","p":"その他","l":9},{"i":389,"k":"여든","j":"80，80歳","m":"名","p":"名詞","l":9},{"i":390,"k":"여섯 개","j":"6個","m":"","p":"その他","l":9},{"i":391,"k":"여섯 시","j":"6時","m":"","p":"その他","l":9},{"i":392,"k":"열 개","j":"10個","m":"","p":"その他","l":9},{"i":393,"k":"열 시","j":"10時","m":"","p":"その他","l":9},{"i":394,"k":"열두 개","j":"12個","m":"","p":"その他","l":9},{"i":395,"k":"열두 시","j":"12時","m":"","p":"その他","l":9},{"i":396,"k":"열한 개","j":"11個","m":"","p":"その他","l":9},{"i":397,"k":"열한 시","j":"11時","m":"","p":"その他","l":9},{"i":398,"k":"예순","j":"60，60歳","m":"名","p":"名詞","l":9},{"i":399,"k":"을","j":"～を（子音）","m":"助","p":"助詞","l":9},{"i":400,"k":"음식","j":"食べ物","m":"名","p":"名詞","l":9},{"i":401,"k":"이야기","j":"話","m":"名","p":"名詞","l":9},{"i":402,"k":"일곱 개","j":"7個","m":"","p":"その他","l":9},{"i":403,"k":"일곱 시","j":"7時","m":"","p":"その他","l":9},{"i":404,"k":"일어나다","j":"起きる","m":"動詞","p":"動詞","l":9},{"i":405,"k":"일흔","j":"70，70歳","m":"名","p":"名詞","l":9},{"i":406,"k":"자다","j":"寝る","m":"動詞","p":"動詞","l":9},{"i":407,"k":"작문","j":"作文","m":"名","p":"名詞","l":9},{"i":408,"k":"잔","j":"杯","m":"名","p":"名詞","l":9},{"i":409,"k":"장","j":"枚","m":"名","p":"名詞","l":9},{"i":410,"k":"전혀","j":"全然","m":"副","p":"副詞","l":9},{"i":411,"k":"점원","j":"店員","m":"名","p":"名詞","l":9},{"i":412,"k":"주세요","j":"ください","m":"表現","p":"表現","l":9},{"i":413,"k":"지하철을 탑니다","j":"地下鉄に乗ります","m":"表現","p":"表現","l":9},{"i":414,"k":"출구","j":"出口","m":"名","p":"名詞","l":9},{"i":415,"k":"친구를 만납니다","j":"友達に会います","m":"表現","p":"表現","l":9},{"i":416,"k":"케이크","j":"ケーキ","m":"名","p":"名詞","l":9},{"i":417,"k":"한","j":"1（助数詞前）","m":"","p":"その他","l":9},{"i":418,"k":"한 개","j":"1個","m":"","p":"その他","l":9},{"i":419,"k":"건물","j":"建物","m":"名","p":"名詞","l":10},{"i":420,"k":"과제","j":"課題","m":"名","p":"名詞","l":10},{"i":421,"k":"교시","j":"時限","m":"名","p":"名詞","l":10},{"i":422,"k":"구","j":"9","m":"漢数詞","p":"数詞","l":10},{"i":423,"k":"구월","j":"9月","m":"","p":"その他","l":10},{"i":424,"k":"그럼","j":"では","m":"副","p":"副詞","l":10},{"i":425,"k":"금요일","j":"金曜日","m":"名","p":"名詞","l":10},{"i":426,"k":"까지","j":"～まで","m":"助","p":"助詞","l":10},{"i":427,"k":"내년","j":"来年","m":"名","p":"名詞","l":10},{"i":428,"k":"내일","j":"明日","m":"名","p":"名詞","l":10},{"i":429,"k":"년","j":"年","m":"名","p":"名詞","l":10},{"i":430,"k":"년생","j":"年生まれ","m":"名","p":"名詞","l":10},{"i":431,"k":"다음 달","j":"来月","m":"名","p":"名詞","l":10},{"i":432,"k":"다음 주","j":"来週","m":"名","p":"名詞","l":10},{"i":433,"k":"만","j":"万","m":"漢数詞","p":"数詞","l":10},{"i":434,"k":"만","j":"満, だけ","m":"名，助","p":"名詞","l":10},{"i":435,"k":"며칠","j":"何日","m":"名","p":"名詞","l":10},{"i":436,"k":"몇","j":"何（数詞）","m":"","p":"その他","l":10},{"i":437,"k":"목요일","j":"木曜日","m":"名","p":"名詞","l":10},{"i":438,"k":"무슨","j":"何（種類）","m":"","p":"その他","l":10},{"i":439,"k":"백","j":"百","m":"漢数詞","p":"数詞","l":10},{"i":440,"k":"번","j":"番","m":"名","p":"名詞","l":10},{"i":441,"k":"부터","j":"～から","m":"助","p":"助詞","l":10},{"i":442,"k":"분","j":"分","m":"名","p":"名詞","l":10},{"i":443,"k":"사","j":"4","m":"漢数詞","p":"数詞","l":10},{"i":444,"k":"사월","j":"4月","m":"","p":"その他","l":10},{"i":445,"k":"삼","j":"3","m":"漢数詞","p":"数詞","l":10},{"i":446,"k":"삼월","j":"3月","m":"","p":"その他","l":10},{"i":447,"k":"샌드위치","j":"サンドイッチ","m":"名","p":"名詞","l":10},{"i":448,"k":"수요일","j":"水曜日","m":"名","p":"名詞","l":10},{"i":449,"k":"시월","j":"10月","m":"","p":"その他","l":10},{"i":450,"k":"시험","j":"試験","m":"名","p":"名詞","l":10},{"i":451,"k":"십","j":"10","m":"漢数詞","p":"数詞","l":10},{"i":452,"k":"십이월","j":"12月","m":"","p":"その他","l":10},{"i":453,"k":"십일월","j":"11月","m":"","p":"その他","l":10},{"i":454,"k":"아직","j":"まだ","m":"副","p":"副詞","l":10},{"i":455,"k":"알바","j":"バイト","m":"名","p":"名詞","l":10},{"i":456,"k":"약을 먹다","j":"薬を飲む","m":"表現","p":"表現","l":10},{"i":457,"k":"어제","j":"昨日","m":"名","p":"名詞","l":10},{"i":458,"k":"언제","j":"いつ","m":"名","p":"名詞","l":10},{"i":459,"k":"엔","j":"円","m":"名","p":"名詞","l":10},{"i":460,"k":"영 / 공","j":"0","m":"漢数詞","p":"数詞","l":10},{"i":461,"k":"오","j":"5","m":"漢数詞","p":"数詞","l":10},{"i":462,"k":"오월","j":"5月","m":"","p":"その他","l":10},{"i":463,"k":"운동","j":"運動","m":"名","p":"名詞","l":10},{"i":464,"k":"원","j":"ウォン","m":"名","p":"名詞","l":10},{"i":465,"k":"월","j":"月","m":"名","p":"名詞","l":10},{"i":466,"k":"월요일","j":"月曜日","m":"名","p":"名詞","l":10},{"i":467,"k":"유월","j":"6月","m":"","p":"その他","l":10},{"i":468,"k":"유학","j":"留学","m":"名","p":"名詞","l":10},{"i":469,"k":"육","j":"6","m":"漢数詞","p":"数詞","l":10},{"i":470,"k":"이","j":"2","m":"漢数詞","p":"数詞","l":10},{"i":471,"k":"이번 달","j":"今月","m":"名","p":"名詞","l":10},{"i":472,"k":"이번 주","j":"今週","m":"名","p":"名詞","l":10},{"i":473,"k":"이월","j":"2月","m":"","p":"その他","l":10},{"i":474,"k":"인분","j":"人前","m":"名","p":"名詞","l":10},{"i":475,"k":"일","j":"1","m":"漢数詞","p":"数詞","l":10},{"i":476,"k":"일","j":"日","m":"名","p":"名詞","l":10},{"i":477,"k":"일요일","j":"日曜日","m":"名","p":"名詞","l":10},{"i":478,"k":"일월","j":"1月","m":"","p":"その他","l":10},{"i":479,"k":"전","j":"前","m":"名","p":"名詞","l":10},{"i":480,"k":"전부","j":"全部","m":"名，副","p":"名詞","l":10},{"i":481,"k":"지난달","j":"先月","m":"名","p":"名詞","l":10},{"i":482,"k":"지난주","j":"先週","m":"名","p":"名詞","l":10},{"i":483,"k":"처음","j":"初めて","m":"名","p":"名詞","l":10},{"i":484,"k":"천","j":"千","m":"漢数詞","p":"数詞","l":10},{"i":485,"k":"층","j":"階","m":"名","p":"名詞","l":10},{"i":486,"k":"칠","j":"7","m":"漢数詞","p":"数詞","l":10},{"i":487,"k":"칠월","j":"7月","m":"","p":"その他","l":10},{"i":488,"k":"토요일","j":"土曜日","m":"名","p":"名詞","l":10},{"i":489,"k":"팔","j":"8","m":"漢数詞","p":"数詞","l":10},{"i":490,"k":"팔월","j":"8月","m":"","p":"その他","l":10},{"i":491,"k":"평일","j":"平日","m":"名","p":"名詞","l":10},{"i":492,"k":"학번","j":"学番(入学年度)","m":"名","p":"名詞","l":10},{"i":493,"k":"화요일","j":"火曜日","m":"名","p":"名詞","l":10},{"i":494,"k":"후","j":"後","m":"名","p":"名詞","l":10},{"i":495,"k":"가끔","j":"たまに","m":"副","p":"副詞","l":11},{"i":496,"k":"거의 -지 않다","j":"ほとんど～しない","m":"","p":"その他","l":11},{"i":497,"k":"건너다","j":"渡る","m":"動","p":"動詞","l":11},{"i":498,"k":"걸리다","j":"かかる","m":"動","p":"動詞","l":11},{"i":499,"k":"걸어서","j":"歩いて","m":"","p":"その他","l":11},{"i":500,"k":"계산하다","j":"会計する","m":"動","p":"動詞","l":11},{"i":501,"k":"공항","j":"空港","m":"名","p":"名詞","l":11},{"i":502,"k":"괜찮다","j":"大丈夫だ","m":"形","p":"形容詞","l":11},{"i":503,"k":"그래도","j":"それでも","m":"接続詞","p":"その他","l":11},{"i":504,"k":"그런데","j":"ところで","m":"接続詞","p":"その他","l":11},{"i":505,"k":"나오다","j":"出て来る","m":"動","p":"動詞","l":11},{"i":506,"k":"내다","j":"出す","m":"動","p":"動詞","l":11},{"i":507,"k":"다 같이","j":"皆（で）一緒に","m":"副","p":"副詞","l":11},{"i":508,"k":"되다","j":"なる, 経つ","m":"動","p":"動詞","l":11},{"i":509,"k":"들어가다","j":"入る","m":"動","p":"動詞","l":11},{"i":510,"k":"띄다","j":"（目に）つく","m":"動","p":"動詞","l":11},{"i":511,"k":"리무진 버스","j":"リムジンバス","m":"名","p":"名詞","l":11},{"i":512,"k":"말하다","j":"言う","m":"動","p":"動詞","l":11},{"i":513,"k":"맛있다","j":"おいしい","m":"形","p":"形容詞","l":11},{"i":514,"k":"매일","j":"毎日","m":"副","p":"副詞","l":11},{"i":515,"k":"뭐","j":"何","m":"名","p":"名詞","l":11},{"i":516,"k":"바꾸다","j":"変える","m":"動","p":"動詞","l":11},{"i":517,"k":"받다","j":"もらう, 受け取る","m":"動","p":"動詞","l":11},{"i":518,"k":"보내다","j":"送る","m":"動","p":"動詞","l":11},{"i":519,"k":"비행기","j":"飛行機","m":"名","p":"名詞","l":11},{"i":520,"k":"살다","j":"住む","m":"動","p":"動詞","l":11},{"i":521,"k":"서울","j":"ソウル","m":"名","p":"名詞","l":11},{"i":522,"k":"서울역","j":"ソウル駅","m":"名","p":"名詞","l":11},{"i":523,"k":"세다","j":"強い","m":"動","p":"動詞","l":11},{"i":524,"k":"손","j":"手","m":"名","p":"名詞","l":11},{"i":525,"k":"쇼핑","j":"ショッピング","m":"名","p":"名詞","l":11},{"i":526,"k":"숟가락","j":"スプーン","m":"名","p":"名詞","l":11},{"i":527,"k":"시원하다","j":"涼しい","m":"形","p":"形容詞","l":11},{"i":528,"k":"신오쿠보","j":"新大久保","m":"名","p":"名詞","l":11},{"i":529,"k":"어떻게","j":"どのように","m":"副","p":"副詞","l":11},{"i":530,"k":"언제나","j":"いつも","m":"副","p":"副詞","l":11},{"i":531,"k":"얼마나","j":"どれくらい","m":"副","p":"副詞","l":11},{"i":532,"k":"요코하마","j":"横浜","m":"名","p":"名詞","l":11},{"i":533,"k":"웃다","j":"笑う","m":"動","p":"動詞","l":11},{"i":534,"k":"이동하다","j":"移動する","m":"動","p":"動詞","l":11},{"i":535,"k":"일본말","j":"日本語","m":"名","p":"名詞","l":11},{"i":536,"k":"일주일","j":"一週間","m":"名","p":"名詞","l":11},{"i":537,"k":"잘되다","j":"うまくいく","m":"動","p":"動詞","l":11},{"i":538,"k":"전혀 -지 않다","j":"全然～しない","m":"","p":"その他","l":11},{"i":539,"k":"쯤","j":"くらい、程","m":"接尾詞","p":"助詞","l":11},{"i":540,"k":"카드","j":"カード","m":"名","p":"名詞","l":11},{"i":541,"k":"태블릿","j":"タブレット","m":"名","p":"名詞","l":11},{"i":542,"k":"택시","j":"タクシー","m":"名","p":"名詞","l":11},{"i":543,"k":"펴다","j":"開く","m":"動","p":"動詞","l":11},{"i":544,"k":"하지만","j":"だけど","m":"接続詞","p":"その他","l":11},{"i":545,"k":"한 시간","j":"1時間","m":"","p":"その他","l":11},{"i":546,"k":"한국말","j":"韓国語","m":"名","p":"名詞","l":11},{"i":547,"k":"항상","j":"常に","m":"副","p":"副詞","l":11},{"i":548,"k":"가르치다","j":"教える","m":"動","p":"動詞","l":12},{"i":549,"k":"가장","j":"最も","m":"副","p":"副詞","l":12},{"i":550,"k":"갑자기","j":"急に","m":"副","p":"副詞","l":12},{"i":551,"k":"같이","j":"一緒に","m":"副","p":"副詞","l":12},{"i":552,"k":"꼭","j":"必ず","m":"副","p":"副詞","l":12},{"i":553,"k":"너무","j":"あまりに，～すぎる","m":"副","p":"副詞","l":12},{"i":554,"k":"늦다","j":"遅い、遅れる","m":"形","p":"形容詞","l":12},{"i":555,"k":"다","j":"全部，全て","m":"副","p":"副詞","l":12},{"i":556,"k":"다시","j":"ふたたび，また","m":"副","p":"副詞","l":12},{"i":557,"k":"더","j":"もっと，より","m":"副","p":"副詞","l":12},{"i":558,"k":"동아리","j":"サークル","m":"名","p":"名詞","l":12},{"i":559,"k":"따뜻하다","j":"暖かい","m":"形","p":"形容詞","l":12},{"i":560,"k":"또","j":"また","m":"副","p":"副詞","l":12},{"i":561,"k":"리포트를 하다","j":"レポートをする","m":"","p":"その他","l":12},{"i":562,"k":"별로","j":"あまり","m":"副","p":"副詞","l":12},{"i":563,"k":"빨리","j":"速く","m":"副","p":"副詞","l":12},{"i":564,"k":"삼겹살","j":"サムギョプサル","m":"名","p":"名詞","l":12},{"i":565,"k":"아주","j":"とても","m":"副","p":"副詞","l":12},{"i":566,"k":"어때요?","j":"どうですか？","m":"","p":"その他","l":12},{"i":567,"k":"어제 저녁","j":"昨日（昨夜）の夕食","m":"","p":"その他","l":12},{"i":568,"k":"어젯밤","j":"昨夜","m":"名","p":"名詞","l":12},{"i":569,"k":"열심히","j":"一生懸命に","m":"副","p":"副詞","l":12},{"i":570,"k":"오늘 아침","j":"今朝","m":"","p":"その他","l":12},{"i":571,"k":"외우다","j":"覚える","m":"動","p":"動詞","l":12},{"i":572,"k":"우리집","j":"我が家","m":"名","p":"名詞","l":12},{"i":573,"k":"우아","j":"わぁ","m":"感嘆詞","p":"表現","l":12},{"i":574,"k":"이제","j":"もう","m":"副","p":"副詞","l":12},{"i":575,"k":"잘","j":"よく","m":"副","p":"副詞","l":12},{"i":576,"k":"제일","j":"一番","m":"副","p":"副詞","l":12},{"i":577,"k":"좀","j":"少し","m":"副","p":"副詞","l":12},{"i":578,"k":"천천히","j":"ゆっくり","m":"副","p":"副詞","l":12},{"i":579,"k":"친구 모임","j":"友達の集まり","m":"","p":"その他","l":12},{"i":580,"k":"한국 드라마를 보다","j":"韓国ドラマを見る","m":"名","p":"名詞","l":12},{"i":581,"k":"감기에 걸리다","j":"風邪をひく","m":"","p":"その他","l":13},{"i":582,"k":"검색하다","j":"検索する","m":"動","p":"動詞","l":13},{"i":583,"k":"계시다","j":"いらっしゃる","m":"","p":"その他","l":13},{"i":584,"k":"공부하세요","j":"勉強してください（指示）","m":"","p":"その他","l":13},{"i":585,"k":"내리다","j":"降りる","m":"動","p":"動詞","l":13},{"i":586,"k":"댁","j":"お宅","m":"名","p":"名詞","l":13},{"i":587,"k":"돌솥비빔밥","j":"石焼ビビンバ","m":"名","p":"名詞","l":13},{"i":588,"k":"드시다","j":"召し上がる","m":"動","p":"動詞","l":13},{"i":589,"k":"만드는 법","j":"作り方","m":"名","p":"名詞","l":13},{"i":590,"k":"만드세요","j":"作られます（尊敬）","m":"","p":"その他","l":13},{"i":591,"k":"말씀","j":"お言葉","m":"名","p":"名詞","l":13},{"i":592,"k":"분","j":"方","m":"名","p":"名詞","l":13},{"i":593,"k":"사이즈","j":"サイズ","m":"名","p":"名詞","l":13},{"i":594,"k":"서점","j":"書店","m":"名","p":"名詞","l":13},{"i":595,"k":"선배세요","j":"先輩でいらっしゃいます","m":"","p":"その他","l":13},{"i":596,"k":"선생님이세요","j":"先生でいらっしゃいます","m":"","p":"その他","l":13},{"i":597,"k":"아침을 먹다","j":"朝食を食べる","m":"","p":"その他","l":13},{"i":598,"k":"안 계시다","j":"いらっしゃらない","m":"","p":"その他","l":13},{"i":599,"k":"어서","j":"是非とも，ぜひ","m":"副","p":"副詞","l":13},{"i":600,"k":"없으시다","j":"おありでない","m":"","p":"その他","l":13},{"i":601,"k":"연락하다","j":"連絡する","m":"動","p":"動詞","l":13},{"i":602,"k":"연세","j":"お歳","m":"名","p":"名詞","l":13},{"i":603,"k":"있으시다","j":"おありだ（物・時間がある）","m":"","p":"その他","l":13},{"i":604,"k":"잠시만 기다리다","j":"少しだけ待つ","m":"","p":"その他","l":13},{"i":605,"k":"저녁을 만들다","j":"夕食を作る","m":"","p":"その他","l":13},{"i":606,"k":"주무시다","j":"お休みになる","m":"動","p":"動詞","l":13},{"i":607,"k":"지하철 4호선","j":"地下鉄4号線","m":"","p":"その他","l":13},{"i":608,"k":"찾다","j":"探す","m":"動","p":"動詞","l":13},{"i":609,"k":"하세요","j":"なさいます（尊敬）","m":"","p":"その他","l":13},{"i":610,"k":"할머니","j":"祖母","m":"名","p":"名詞","l":13},{"i":611,"k":"횡단보도","j":"横断歩道","m":"名","p":"名詞","l":13},{"i":612,"k":"힘들다","j":"大変だ、つらい","m":"形，動","p":"形容詞","l":13},{"i":613,"k":"갈아입다","j":"着替える","m":"動","p":"動詞","l":14},{"i":614,"k":"갈아타다","j":"乗り換える","m":"動","p":"動詞","l":14},{"i":615,"k":"기쁘다","j":"嬉しい","m":"形","p":"形容詞","l":14},{"i":616,"k":"나쁘다","j":"悪い","m":"形","p":"形容詞","l":14},{"i":617,"k":"노래방","j":"カラオケボックス","m":"名","p":"名詞","l":14},{"i":618,"k":"눈이 오다","j":"雪が降る","m":"","p":"その他","l":14},{"i":619,"k":"맛집","j":"おいしい店","m":"名","p":"名詞","l":14},{"i":620,"k":"문을 닫다","j":"ドアを閉める","m":"","p":"その他","l":14},{"i":621,"k":"문화","j":"文化","m":"名","p":"名詞","l":14},{"i":622,"k":"바람이 불다","j":"風が吹く","m":"","p":"その他","l":14},{"i":623,"k":"방과 후","j":"放課後","m":"名","p":"名詞","l":14},{"i":624,"k":"비가 오다","j":"雨が降る","m":"","p":"その他","l":14},{"i":625,"k":"생기다","j":"出来る、起こる","m":"動","p":"動詞","l":14},{"i":626,"k":"세수하다","j":"顔を洗う","m":"動","p":"動詞","l":14},{"i":627,"k":"소개하다","j":"紹介する","m":"動","p":"動詞","l":14},{"i":628,"k":"슬프다","j":"悲しい","m":"形","p":"形容詞","l":14},{"i":629,"k":"시장","j":"市場","m":"名","p":"名詞","l":14},{"i":630,"k":"신다","j":"履く","m":"動","p":"動詞","l":14},{"i":631,"k":"여러분","j":"皆さん","m":"名","p":"名詞","l":14},{"i":632,"k":"예쁘다","j":"綺麗だ","m":"形","p":"形容詞","l":14},{"i":633,"k":"예약","j":"予約","m":"名","p":"名詞","l":14},{"i":634,"k":"오랜만에","j":"久しぶりに","m":"副","p":"副詞","l":14},{"i":635,"k":"우산을 쓰다","j":"傘をさす","m":"","p":"その他","l":14},{"i":636,"k":"일찍 드시다","j":"早く召し上がる","m":"","p":"その他","l":14},{"i":637,"k":"입다","j":"着る","m":"動","p":"動詞","l":14},{"i":638,"k":"잊다","j":"忘れる","m":"動","p":"動詞","l":14},{"i":639,"k":"장을 보다","j":"買い出しをする","m":"","p":"その他","l":14},{"i":640,"k":"책을 빌리다","j":"本を借りる","m":"","p":"その他","l":14},{"i":641,"k":"타다","j":"乗る","m":"動","p":"動詞","l":14},{"i":642,"k":"푹 쉬다","j":"ゆっくり休む","m":"","p":"その他","l":14},{"i":643,"k":"한턱 내다","j":"おごる","m":"","p":"その他","l":14},{"i":644,"k":"가깝다","j":"近い","m":"形","p":"形容詞","l":15},{"i":645,"k":"가볍다","j":"軽い","m":"形","p":"形容詞","l":15},{"i":646,"k":"걷다","j":"歩く","m":"動","p":"動詞","l":15},{"i":647,"k":"고르다","j":"選ぶ","m":"動","p":"動詞","l":15},{"i":648,"k":"고맙다","j":"ありがたい","m":"形","p":"形容詞","l":15},{"i":649,"k":"곱다","j":"美しい","m":"形","p":"形容詞","l":15},{"i":650,"k":"공연","j":"公演","m":"名","p":"名詞","l":15},{"i":651,"k":"굽다","j":"焼く","m":"動","p":"動詞","l":15},{"i":652,"k":"귀엽다","j":"かわいい","m":"形","p":"形容詞","l":15},{"i":653,"k":"기념","j":"記念","m":"名","p":"名詞","l":15},{"i":654,"k":"길이 막히다","j":"道が混む","m":"","p":"その他","l":15},{"i":655,"k":"깜짝","j":"びっくり","m":"副","p":"副詞","l":15},{"i":656,"k":"날씨","j":"天気","m":"名","p":"名詞","l":15},{"i":657,"k":"놀라다","j":"驚く","m":"動","p":"動詞","l":15},{"i":658,"k":"눕다","j":"横になる","m":"動","p":"動詞","l":15},{"i":659,"k":"다르다","j":"異なる","m":"形","p":"形容詞","l":15},{"i":660,"k":"다리가 아프다","j":"脚が痛い","m":"","p":"その他","l":15},{"i":661,"k":"덥다","j":"暑い","m":"形","p":"形容詞","l":15},{"i":662,"k":"돕다","j":"助ける","m":"動","p":"動詞","l":15},{"i":663,"k":"들다","j":"持つ","m":"動","p":"動詞","l":15},{"i":664,"k":"들르다","j":"立ち寄る","m":"動","p":"動詞","l":15},{"i":665,"k":"등산","j":"登山","m":"名","p":"名詞","l":15},{"i":666,"k":"따르다","j":"従う","m":"動","p":"動詞","l":15},{"i":667,"k":"뜨겁다","j":"熱い","m":"形","p":"形容詞","l":15},{"i":668,"k":"마스코트","j":"マスコット","m":"名","p":"名詞","l":15},{"i":669,"k":"맞다","j":"合っている","m":"動","p":"動詞","l":15},{"i":670,"k":"맵다","j":"辛い","m":"形","p":"形容詞","l":15},{"i":671,"k":"멋있다","j":"格好いい,素敵だ","m":"形","p":"形容詞","l":15},{"i":672,"k":"무겁다","j":"重い","m":"形","p":"形容詞","l":15},{"i":673,"k":"묻다","j":"尋ねる, 埋める","m":"動","p":"動詞","l":15},{"i":674,"k":"믿다","j":"信じる","m":"動","p":"動詞","l":15},{"i":675,"k":"반갑다","j":"会えてうれしい","m":"形","p":"形容詞","l":15},{"i":676,"k":"배부르다","j":"お腹がいっぱいだ","m":"形","p":"形容詞","l":15},{"i":677,"k":"부르다","j":"歌う, 呼ぶ","m":"動","p":"動詞","l":15},{"i":678,"k":"빠르다","j":"速い","m":"形","p":"形容詞","l":15},{"i":679,"k":"쉽다","j":"易しい","m":"形","p":"形容詞","l":15},{"i":680,"k":"싣다","j":"載せる","m":"動","p":"動詞","l":15},{"i":681,"k":"싱겁다","j":"味が薄い","m":"形","p":"形容詞","l":15},{"i":682,"k":"아름답다","j":"美しい","m":"形","p":"形容詞","l":15},{"i":683,"k":"아쉽다","j":"物足りない","m":"形","p":"形容詞","l":15},{"i":684,"k":"아쉽다","j":"惜しい","m":"形","p":"形容詞","l":15},{"i":685,"k":"어렵다","j":"難しい","m":"形","p":"形容詞","l":15},{"i":686,"k":"얻다","j":"得る","m":"動","p":"動詞","l":15},{"i":687,"k":"여행","j":"旅行","m":"名","p":"名詞","l":15},{"i":688,"k":"오르다","j":"上がる","m":"動","p":"動詞","l":15},{"i":689,"k":"자막","j":"字幕","m":"名","p":"名詞","l":15},{"i":690,"k":"좁다","j":"狭い","m":"形","p":"形容詞","l":15},{"i":691,"k":"춥다","j":"寒い","m":"形","p":"形容詞","l":15},{"i":692,"k":"치르다","j":"支払う","m":"動","p":"動詞","l":15},{"i":693,"k":"친절하다","j":"親切だ","m":"形","p":"形容詞","l":15},{"i":694,"k":"팬","j":"ファン","m":"名","p":"名詞","l":15},{"i":695,"k":"흐르다","j":"流れる","m":"動","p":"動詞","l":15},{"i":696,"k":"가을","j":"秋","m":"名","p":"名詞","l":16},{"i":697,"k":"같다","j":"同じだ","m":"形","p":"形容詞","l":16},{"i":698,"k":"겨울","j":"冬","m":"名","p":"名詞","l":16},{"i":699,"k":"계절","j":"季節","m":"名","p":"名詞","l":16},{"i":700,"k":"그림 그리기","j":"絵を描くこと","m":"名","p":"名詞","l":16},{"i":701,"k":"깨끗하다","j":"清潔だ","m":"形","p":"形容詞","l":16},{"i":702,"k":"깨끗하다","j":"きれいだ","m":"形","p":"形容詞","l":16},{"i":703,"k":"날","j":"日","m":"名","p":"名詞","l":16},{"i":704,"k":"노란색","j":"黄色","m":"名","p":"名詞","l":16},{"i":705,"k":"눈싸움","j":"雪合戦","m":"名","p":"名詞","l":16},{"i":706,"k":"눈축제","j":"雪まつり","m":"名","p":"名詞","l":16},{"i":707,"k":"단풍놀이","j":"紅葉狩り","m":"名","p":"名詞","l":16},{"i":708,"k":"도시락","j":"お弁当","m":"名","p":"名詞","l":16},{"i":709,"k":"독서","j":"読書","m":"名","p":"名詞","l":16},{"i":710,"k":"문제","j":"問題","m":"名","p":"名詞","l":16},{"i":711,"k":"바다","j":"海","m":"名","p":"名詞","l":16},{"i":712,"k":"바라다","j":"望む","m":"動","p":"動詞","l":16},{"i":713,"k":"바쁘다","j":"忙しい","m":"形","p":"形容詞","l":16},{"i":714,"k":"반갑다","j":"［会えて］うれしい","m":"形","p":"形容詞","l":16},{"i":715,"k":"방법","j":"方法","m":"名","p":"名詞","l":16},{"i":716,"k":"벚꽃놀이","j":"花見","m":"名","p":"名詞","l":16},{"i":717,"k":"보이다","j":"見える","m":"動","p":"動詞","l":16},{"i":718,"k":"봄","j":"春","m":"名","p":"名詞","l":16},{"i":719,"k":"불꽃놀이","j":"花火","m":"名","p":"名詞","l":16},{"i":720,"k":"비싸다","j":"［値段が］高い","m":"形","p":"形容詞","l":16},{"i":721,"k":"수업이 없다","j":"授業がない","m":"","p":"その他","l":16},{"i":722,"k":"싸다","j":"安い","m":"形","p":"形容詞","l":16},{"i":723,"k":"아프다","j":"痛い","m":"形","p":"形容詞","l":16},{"i":724,"k":"어떤","j":"どんな","m":"連体形","p":"その他","l":16},{"i":725,"k":"여름","j":"夏","m":"名","p":"名詞","l":16},{"i":726,"k":"여름축제","j":"夏祭り","m":"名","p":"名詞","l":16},{"i":727,"k":"영화 감상","j":"映画鑑賞","m":"名","p":"名詞","l":16},{"i":728,"k":"요리","j":"料理","m":"名","p":"名詞","l":16},{"i":729,"k":"음악 감상","j":"音楽鑑賞","m":"名","p":"名詞","l":16},{"i":730,"k":"재미있다","j":"おもしろい","m":"形","p":"形容詞","l":16},{"i":731,"k":"준비","j":"準備","m":"名","p":"名詞","l":16},{"i":732,"k":"짧다","j":"短い","m":"形","p":"形容詞","l":16},{"i":733,"k":"축제","j":"祭り","m":"名","p":"名詞","l":16},{"i":734,"k":"축제","j":"祝祭","m":"名","p":"名詞","l":16},{"i":735,"k":"크다","j":"大きい","m":"形","p":"形容詞","l":16},{"i":736,"k":"팔다","j":"売る","m":"動","p":"動詞","l":16},{"i":737,"k":"표정","j":"表情","m":"名","p":"名詞","l":16},{"i":738,"k":"하늘색","j":"空色","m":"名","p":"名詞","l":16},{"i":739,"k":"한식","j":"韓国食","m":"名","p":"名詞","l":16},{"i":740,"k":"걸다","j":"かける","m":"動","p":"動詞","l":17},{"i":741,"k":"것","j":"もの，こと","m":"名","p":"名詞","l":17},{"i":742,"k":"공포 영화","j":"ホラー映画","m":"名","p":"名詞","l":17},{"i":743,"k":"기억","j":"記憶","m":"名","p":"名詞","l":17},{"i":744,"k":"길","j":"道","m":"名","p":"名詞","l":17},{"i":745,"k":"내용","j":"内容","m":"名","p":"名詞","l":17},{"i":746,"k":"돈","j":"お金","m":"名","p":"名詞","l":17},{"i":747,"k":"마지막","j":"最後","m":"마지막으로 만나다","p":"その他","l":17},{"i":748,"k":"마파두부","j":"麻婆豆腐","m":"名","p":"名詞","l":17},{"i":749,"k":"모으다","j":"集める","m":"動","p":"動詞","l":17},{"i":750,"k":"발라드","j":"バラード","m":"名","p":"名詞","l":17},{"i":751,"k":"비싸다","j":"高い","m":"形","p":"形容詞","l":17},{"i":752,"k":"시작하다","j":"始める","m":"動","p":"動詞","l":17},{"i":753,"k":"영화관","j":"映画館","m":"名","p":"名詞","l":17},{"i":754,"k":"장면","j":"場面","m":"名","p":"名詞","l":17},{"i":755,"k":"전쟁","j":"戦争","m":"名","p":"名詞","l":17},{"i":756,"k":"주인공","j":"主人公","m":"名","p":"名詞","l":17},{"i":757,"k":"중에서","j":"～の中で","m":"","p":"その他","l":17},{"i":758,"k":"찍다","j":"撮る","m":"動","p":"動詞","l":17},{"i":759,"k":"추억","j":"思い出","m":"名","p":"名詞","l":17},{"i":760,"k":"필요하다","j":"必要だ","m":"形","p":"形容詞","l":17},{"i":761,"k":"헤어지다","j":"別れる","m":"動","p":"動詞","l":17},{"i":762,"k":"헷갈리다","j":"混同する","m":"動","p":"動詞","l":17},{"i":763,"k":"1년 후에","j":"1年後に","m":"","p":"その他","l":18},{"i":764,"k":"가지고 가다","j":"持って行く","m":"動","p":"動詞","l":18},{"i":765,"k":"굿즈","j":"グッズ","m":"名","p":"名詞","l":18},{"i":766,"k":"글자","j":"文字","m":"名","p":"名詞","l":18},{"i":767,"k":"기타","j":"ギター","m":"名","p":"名詞","l":18},{"i":768,"k":"끝내다","j":"終わらせる","m":"動","p":"動詞","l":18},{"i":769,"k":"누가","j":"誰かが","m":"","p":"その他","l":18},{"i":770,"k":"다음에","j":"次に，今度","m":"","p":"その他","l":18},{"i":771,"k":"못하다","j":"できない","m":"","p":"その他","l":18},{"i":772,"k":"물건","j":"物，品","m":"名","p":"名詞","l":18},{"i":773,"k":"발표","j":"発表","m":"名","p":"名詞","l":18},{"i":774,"k":"배드민턴","j":"バドミントン","m":"名","p":"名詞","l":18},{"i":775,"k":"볼링","j":"ボウリング","m":"名","p":"名詞","l":18},{"i":776,"k":"사람","j":"人","m":"名","p":"名詞","l":18},{"i":777,"k":"상비약","j":"常備薬","m":"名","p":"名詞","l":18},{"i":778,"k":"생각하다","j":"考える","m":"動","p":"動詞","l":18},{"i":779,"k":"스노우보드","j":"スノーボード","m":"名","p":"名詞","l":18},{"i":780,"k":"스케이트","j":"スケート","m":"名","p":"名詞","l":18},{"i":781,"k":"스키","j":"スキー","m":"名","p":"名詞","l":18},{"i":782,"k":"슬라이드","j":"スライド","m":"名","p":"名詞","l":18},{"i":783,"k":"알아듣다","j":"聞き取る","m":"動","p":"動詞","l":18},{"i":784,"k":"앞으로","j":"これから","m":"","p":"その他","l":18},{"i":785,"k":"여권","j":"パスポート","m":"名","p":"名詞","l":18},{"i":786,"k":"열다","j":"開ける","m":"動","p":"動詞","l":18},{"i":787,"k":"예정","j":"予定","m":"名","p":"名詞","l":18},{"i":788,"k":"온천","j":"温泉","m":"名","p":"名詞","l":18},{"i":789,"k":"자동차","j":"自動車","m":"名","p":"名詞","l":18},{"i":790,"k":"장래에","j":"将来に","m":"","p":"その他","l":18},{"i":791,"k":"중요하다","j":"重要だ","m":"形","p":"形容詞","l":18},{"i":792,"k":"지키다","j":"守る","m":"動","p":"動詞","l":18},{"i":793,"k":"짐","j":"荷物","m":"名","p":"名詞","l":18},{"i":794,"k":"치다","j":"弾く，打つ","m":"動","p":"動詞","l":18},{"i":795,"k":"카레","j":"カレー","m":"名","p":"名詞","l":18},{"i":796,"k":"테니스","j":"テニス","m":"名","p":"名詞","l":18},{"i":797,"k":"토픽","j":"TOPIK","m":"名","p":"名詞","l":18},{"i":798,"k":"팁","j":"コツ","m":"名","p":"名詞","l":18},{"i":799,"k":"페어","j":"ペア","m":"名","p":"名詞","l":18},{"i":800,"k":"피아노","j":"ピアノ","m":"名","p":"名詞","l":18},{"i":801,"k":"해외여행","j":"海外旅行","m":"名","p":"名詞","l":18},{"i":802,"k":"공원","j":"公園","m":"名","p":"名詞","l":19},{"i":803,"k":"끝나다","j":"終わる","m":"動","p":"動詞","l":19},{"i":804,"k":"나가다","j":"出る，出掛ける","m":"動","p":"動詞","l":19},{"i":805,"k":"덕분에","j":"お陰様で","m":"","p":"その他","l":19},{"i":806,"k":"도착하다","j":"到着する","m":"動","p":"動詞","l":19},{"i":807,"k":"말이 많다","j":"おしゃべりだ","m":"","p":"その他","l":19},{"i":808,"k":"몸","j":"体","m":"名","p":"名詞","l":19},{"i":809,"k":"문자","j":"文字, テキスト","m":"名","p":"名詞","l":19},{"i":810,"k":"보시다","j":"ご覧になる","m":"動","p":"動詞","l":19},{"i":811,"k":"산책하다","j":"散歩する","m":"動","p":"動詞","l":19},{"i":812,"k":"슬슬","j":"そろそろ","m":"副","p":"副詞","l":19},{"i":813,"k":"시내","j":"中心街","m":"名","p":"名詞","l":19},{"i":814,"k":"식사하다","j":"食事する","m":"動","p":"動詞","l":19},{"i":815,"k":"아프다","j":"具合が悪い","m":"形","p":"形容詞","l":19},{"i":816,"k":"양념","j":"味付け","m":"名","p":"名詞","l":19},{"i":817,"k":"연습하다","j":"練習する","m":"動","p":"動詞","l":19},{"i":818,"k":"오시다","j":"来られる","m":"動","p":"動詞","l":19},{"i":819,"k":"인기","j":"人気","m":"名","p":"名詞","l":19},{"i":820,"k":"읽으시다","j":"お読みになる","m":"動","p":"動詞","l":19},{"i":821,"k":"잘생기다","j":"ハンサムだ, 格好いい","m":"","p":"その他","l":19},{"i":822,"k":"잘하다","j":"うまくできる","m":"動","p":"動詞","l":19},{"i":823,"k":"출발하다","j":"出発する","m":"動","p":"動詞","l":19},{"i":824,"k":"행복하다","j":"幸せだ","m":"","p":"その他","l":19},{"i":825,"k":"가족","j":"家族","m":"名","p":"名詞","l":20},{"i":826,"k":"결혼하다","j":"結婚する","m":"動","p":"動詞","l":20},{"i":827,"k":"공휴일","j":"祝日","m":"名","p":"名詞","l":20},{"i":828,"k":"금방","j":"今さっき，たった今","m":"副","p":"副詞","l":20},{"i":829,"k":"길다","j":"長い","m":"","p":"その他","l":20},{"i":830,"k":"남다","j":"残る","m":"動","p":"動詞","l":20},{"i":831,"k":"다치다","j":"怪我する","m":"動","p":"動詞","l":20},{"i":832,"k":"다행이다","j":"幸いだ","m":"形","p":"形容詞","l":20},{"i":833,"k":"라디오","j":"ラジオ","m":"名","p":"名詞","l":20},{"i":834,"k":"문자를 하다","j":"テキストのやり取りをする，メッセージを送る","m":"動","p":"動詞","l":20},{"i":835,"k":"밖에","j":"～しか","m":"助","p":"助詞","l":20},{"i":836,"k":"방금","j":"ただいま，今","m":"副","p":"副詞","l":20},{"i":837,"k":"배가 부르다","j":"お腹がいっぱいだ","m":"形","p":"形容詞","l":20},{"i":838,"k":"벌써","j":"もう，早くも，すでに","m":"副","p":"副詞","l":20},{"i":839,"k":"부딪치다","j":"ぶつかる","m":"動","p":"動詞","l":20},{"i":840,"k":"빨래","j":"洗濯","m":"名","p":"名詞","l":20},{"i":841,"k":"사고","j":"事故","m":"名","p":"名詞","l":20},{"i":842,"k":"생기다","j":"できる","m":"動","p":"動詞","l":20},{"i":843,"k":"설명하다","j":"説明する","m":"動","p":"動詞","l":20},{"i":844,"k":"순두부","j":"スンドゥブ","m":"","p":"その他","l":20},{"i":845,"k":"술집","j":"飲み屋","m":"名","p":"名詞","l":20},{"i":846,"k":"신문","j":"新聞","m":"名","p":"名詞","l":20},{"i":847,"k":"오래","j":"長い間","m":"副","p":"副詞","l":20},{"i":848,"k":"요리하다","j":"料理する","m":"動","p":"動詞","l":20},{"i":849,"k":"응원하다","j":"応援する","m":"","p":"その他","l":20},{"i":850,"k":"이야기하다","j":"話す","m":"動","p":"動詞","l":20},{"i":851,"k":"잘하시다","j":"お上手だ","m":"","p":"その他","l":20},{"i":852,"k":"잠들다","j":"寝入る","m":"","p":"その他","l":20},{"i":853,"k":"잠이 오다","j":"眠い","m":"名","p":"名詞","l":20},{"i":854,"k":"조심하다","j":"気を付ける","m":"動","p":"動詞","l":20},{"i":855,"k":"죄송하다","j":"申し訳ない","m":"形","p":"形容詞","l":20},{"i":856,"k":"주고 받다","j":"やり取りする","m":"動","p":"動詞","l":20},{"i":857,"k":"지내다","j":"過ごす","m":"動","p":"動詞","l":20},{"i":858,"k":"창문","j":"窓","m":"","p":"その他","l":20},{"i":859,"k":"청소","j":"掃除","m":"名","p":"名詞","l":20},{"i":860,"k":"학기","j":"学期","m":"名","p":"名詞","l":20},{"i":861,"k":"가르쳐 주시다","j":"教えてくださる","m":"","p":"その他","l":21},{"i":862,"k":"갔다 오다","j":"行って来る","m":"","p":"その他","l":21},{"i":863,"k":"긋다","j":"線を引く","m":"動","p":"動詞","l":21},{"i":864,"k":"기회가 생기다","j":"チャンスができる","m":"慣用句","p":"表現","l":21},{"i":865,"k":"길","j":"道, 街","m":"名","p":"名詞","l":21},{"i":866,"k":"까만색","j":"黒色","m":"名","p":"名詞","l":21},{"i":867,"k":"까맣다","j":"黒い","m":"形","p":"形容詞","l":21},{"i":868,"k":"낫다","j":"治る","m":"動","p":"動詞","l":21},{"i":869,"k":"낫다","j":"ましだ","m":"動","p":"動詞","l":21},{"i":870,"k":"낳다","j":"生む","m":"動","p":"動詞","l":21},{"i":871,"k":"넣다","j":"入れる","m":"動","p":"動詞","l":21},{"i":872,"k":"노랗다","j":"黄色い","m":"形","p":"形容詞","l":21},{"i":873,"k":"놓다","j":"置く","m":"動","p":"動詞","l":21},{"i":874,"k":"동그랗다","j":"丸い","m":"形","p":"形容詞","l":21},{"i":875,"k":"마음에 들다","j":"気に入る","m":"慣用句","p":"表現","l":21},{"i":876,"k":"말씀하시다","j":"おっしゃる","m":"","p":"その他","l":21},{"i":877,"k":"모임","j":"集まり","m":"名","p":"名詞","l":21},{"i":878,"k":"바쁘시다","j":"お忙しい","m":"動","p":"動詞","l":21},{"i":879,"k":"밥을 짓다","j":"ご飯を炊く","m":"慣用句","p":"表現","l":21},{"i":880,"k":"벗다","j":"脱ぐ","m":"動","p":"動詞","l":21},{"i":881,"k":"부모님","j":"両親","m":"名","p":"名詞","l":21},{"i":882,"k":"붓다","j":"注ぐ","m":"動","p":"動詞","l":21},{"i":883,"k":"비교하다","j":"比べる","m":"動","p":"動詞","l":21},{"i":884,"k":"빨간색","j":"赤色","m":"名","p":"名詞","l":21},{"i":885,"k":"빨갛다","j":"赤い","m":"形","p":"形容詞","l":21},{"i":886,"k":"빼앗다","j":"奪う","m":"動","p":"動詞","l":21},{"i":887,"k":"쉽다","j":"簡単だ，易しい","m":"形","p":"形容詞","l":21},{"i":888,"k":"시작하다","j":"始まる","m":"動","p":"動詞","l":21},{"i":889,"k":"씻다","j":"洗う","m":"動","p":"動詞","l":21},{"i":890,"k":"안되다","j":"だめだ","m":"","p":"その他","l":21},{"i":891,"k":"약을 짓다","j":"薬を調合する","m":"慣用句","p":"表現","l":21},{"i":892,"k":"어떻다","j":"どうだ","m":"形","p":"形容詞","l":21},{"i":893,"k":"에어컨","j":"エアコン","m":"名","p":"名詞","l":21},{"i":894,"k":"연락을 주다","j":"連絡をくれる","m":"","p":"その他","l":21},{"i":895,"k":"연락처","j":"連絡先","m":"名","p":"名詞","l":21},{"i":896,"k":"이렇다","j":"こうだ","m":"形","p":"形容詞","l":21},{"i":897,"k":"이름을 짓다","j":"名前を付ける","m":"慣用句","p":"表現","l":21},{"i":898,"k":"이해하다","j":"わかる, 理解する","m":"動","p":"動詞","l":21},{"i":899,"k":"잇다","j":"つなぐ","m":"動","p":"動詞","l":21},{"i":900,"k":"작다","j":"小さい","m":"形","p":"形容詞","l":21},{"i":901,"k":"저렇다","j":"ああだ","m":"形","p":"形容詞","l":21},{"i":902,"k":"좋겠다","j":"～たらいいな","m":"","p":"その他","l":21},{"i":903,"k":"집을 짓다","j":"家を建てる","m":"慣用句","p":"表現","l":21},{"i":904,"k":"짓다","j":"建てる, 作る, つける","m":"動","p":"動詞","l":21},{"i":905,"k":"참다","j":"我慢する","m":"動","p":"動詞","l":21},{"i":906,"k":"초대하다","j":"招待する","m":"動","p":"動詞","l":21},{"i":907,"k":"추위","j":"寒さ","m":"名","p":"名詞","l":21},{"i":908,"k":"파란색","j":"青色","m":"名","p":"名詞","l":21},{"i":909,"k":"파랗다","j":"青い","m":"形","p":"形容詞","l":21},{"i":910,"k":"패딩","j":"ダウンコート","m":"名","p":"名詞","l":21},{"i":911,"k":"하얀색","j":"白色","m":"名","p":"名詞","l":21},{"i":912,"k":"하얗다","j":"白い","m":"形","p":"形容詞","l":21},{"i":913,"k":"휴가","j":"休暇","m":"名","p":"名詞","l":21},{"i":914,"k":"-(이)나","j":"～とか","m":"","p":"その他","l":22},{"i":915,"k":"가게","j":"店","m":"名","p":"名詞","l":22},{"i":916,"k":"가수","j":"歌手","m":"名","p":"名詞","l":22},{"i":917,"k":"공부","j":"勉強","m":"名","p":"名詞","l":22},{"i":918,"k":"꽤","j":"かなり","m":"副","p":"副詞","l":22},{"i":919,"k":"다음에","j":"今度，次回に","m":"副","p":"副詞","l":22},{"i":920,"k":"더 낫다","j":"もっとましだ","m":"","p":"その他","l":22},{"i":921,"k":"덜","j":"控えめに","m":"副","p":"副詞","l":22},{"i":922,"k":"둘이서","j":"2人で","m":"副","p":"副詞","l":22},{"i":923,"k":"맵게","j":"辛く","m":"副","p":"副詞","l":22},{"i":924,"k":"몇 달","j":"何ヶ月か","m":"","p":"その他","l":22},{"i":925,"k":"목","j":"のど，首","m":"名","p":"名詞","l":22},{"i":926,"k":"문을 닫다","j":"閉店する","m":"","p":"その他","l":22},{"i":927,"k":"병원","j":"病院","m":"名","p":"名詞","l":22},{"i":928,"k":"사 먹는 것","j":"買って食べること","m":"","p":"その他","l":22},{"i":929,"k":"사인","j":"サイン","m":"名","p":"名詞","l":22},{"i":930,"k":"생각","j":"思う，考え，思い","m":"名","p":"名詞","l":22},{"i":931,"k":"셋이서","j":"3人で","m":"副","p":"副詞","l":22},{"i":932,"k":"얼마 안 되다","j":"あまり経っていない","m":"表現","p":"表現","l":22},{"i":933,"k":"오래되다","j":"長くなる，古くなる","m":"","p":"その他","l":22},{"i":934,"k":"올해 여름","j":"今年の夏","m":"","p":"その他","l":22},{"i":935,"k":"유명하다","j":"有名だ","m":"形","p":"形容詞","l":22},{"i":936,"k":"이서","j":"～で（人数）","m":"","p":"その他","l":22},{"i":937,"k":"입원하다","j":"入院する","m":"動","p":"動詞","l":22},{"i":938,"k":"직접","j":"直接","m":"名","p":"名詞","l":22},{"i":939,"k":"키가 크다","j":"背が高い","m":"","p":"その他","l":22},{"i":940,"k":"한 번 만나다","j":"一度会う","m":"","p":"その他","l":22},{"i":941,"k":"해 먹는 것","j":"作って食べること","m":"","p":"その他","l":22},{"i":942,"k":"혼자서","j":"ひとり（で）","m":"副","p":"副詞","l":22}];
+
+/* ---------- storage ---------- */
+const KEY='korean-cards-v1';
+let memOnly=false;
+function readLS(){ try{ return localStorage.getItem(KEY); }catch(e){ memOnly=true; return null; } }
+function writeLS(v){ try{ localStorage.setItem(KEY,v); }catch(e){ memOnly=true; } }
+
+const DEF={ cards:{}, days:{},
+  cfg:{ lessons:[1], pos:[], star:false, round:20, dir:'mix', rate:0.85, auto:true, theme:'auto' } };
+let ST=DEF;
+try{ const r=readLS(); if(r) ST=Object.assign({}, DEF, JSON.parse(r)); }catch(e){}
+ST.cfg=Object.assign({}, DEF.cfg, ST.cfg||{});
+ST.cards=ST.cards||{}; ST.days=ST.days||{};
+
+let saveT=null;
+function save(){ clearTimeout(saveT); saveT=setTimeout(()=>writeLS(JSON.stringify(ST)),250); }
+
+/* ---------- model ---------- */
+const DAY=864e5;
+const INT=[0, 10*60e3, 8*36e5, 1*DAY, 3*DAY, 7*DAY, 16*DAY, 35*DAY];
+const POS=['名詞','動詞','形容詞','副詞','助詞','表現','数詞','その他'];
+const LESSONS=[...new Set(WORDS.map(w=>w.l))].sort((a,b)=>a-b);
+const icon=(n,c)=>'<svg class="ic'+(c?' '+c:'')+'"><use href="#i-'+n+'"/></svg>';
+
+function C(id){ return ST.cards[id] || (ST.cards[id]={lv:0,due:0,seen:0,ok:0,ng:0,st:0}); }
+function peek(id){ return ST.cards[id]; }
+function bucket(id){ const c=peek(id); if(!c||!c.seen) return 'new'; return c.lv>=3?'done':'learn'; }
+function isDue(id){ const c=peek(id); return !!(c&&c.seen&&c.due<=Date.now()); }
+function dstr(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function today(){ return dstr(new Date()); }
+
+function grade(id, good){
+  const c=C(id); c.seen=1;
+  if(good){ c.lv=Math.min(INT.length-1, c.lv+1); c.ok++; }
+  else { c.lv=Math.max(0, c.lv-2); c.ng++; }
+  c.due=Date.now()+INT[c.lv];
+  const t=today(); ST.days[t]=(ST.days[t]||0)+1;
+  save();
+}
+function streak(){
+  let n=0; const d=new Date();
+  for(let i=0;i<3650;i++){
+    const k=dstr(d);
+    if(ST.days[k]) n++;
+    else if(n>0 || k!==today()) break;
+    d.setDate(d.getDate()-1);
+  }
+  return n;
+}
+function pool(){
+  const {lessons,pos,star}=ST.cfg;
+  return WORDS.filter(w=>
+    (!lessons.length || lessons.includes(w.l)) &&
+    (!pos.length || pos.includes(w.p)) &&
+    (!star || (peek(w.i)&&peek(w.i).st))
+  );
+}
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+/* ---------- speech ---------- */
+let koVoice=null;
+function pickVoice(){
+  if(!('speechSynthesis' in window)) return;
+  const vs=speechSynthesis.getVoices()||[];
+  koVoice = vs.find(v=>v.lang&&v.lang.toLowerCase().replace('_','-').startsWith('ko')) || null;
+  const el=document.getElementById('voiceInfo');
+  if(el) el.textContent = koVoice ? ('使用中: '+koVoice.name)
+    : '韓国語の音声が見つかりません。iPhoneの 設定 ▸ アクセシビリティ ▸ 読み上げコンテンツ ▸ 声 で韓国語を追加してください';
+}
+if('speechSynthesis' in window){ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }
+function speak(text){
+  if(!('speechSynthesis' in window)) return;
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang='ko-KR'; u.rate=ST.cfg.rate;
+    if(koVoice) u.voice=koVoice;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function seg(sel, val, fn){
+  $$(sel+' button').forEach(b=>{
+    b.classList.toggle('on', String(b.dataset.v)===String(val));
+    b.onclick=()=>fn(b.dataset.v);
+  });
+}
+function sw(el, on, fn){ el.classList.toggle('on', !!on); el.onclick=()=>fn(!el.classList.contains('on')); }
+
+/* 自前の確認ダイアログ。ブラウザ標準の confirm/alert は表示環境によって
+   ブロックされ、押しても何も起きなくなるため使わない */
+let mDone=null;
+function openModal(text, yes, showNo, danger){
+  return new Promise(res=>{
+    $('#mText').textContent=text;
+    $('#mYes').textContent=yes;
+    $('#mYes').className='btn '+(danger?'d':'p');
+    $('#mNo').hidden=!showNo;
+    $('#modal').hidden=false;
+    $('#mYes').focus();
+    mDone=res;
+  });
+}
+function closeModal(v){ $('#modal').hidden=true; const r=mDone; mDone=null; if(r) r(v); }
+const ask =(t,yes='OK',danger=false)=>openModal(t,yes,true,danger);
+const tell=(t)=>openModal(t,'OK',false,false);
+$('#mYes').onclick=()=>closeModal(true);
+$('#mNo').onclick=()=>closeModal(false);
+$('#modal').onclick=e=>{ if(e.target===$('#modal')) closeModal(false); };
+
+/* ---------- home ---------- */
+function renderHome(){
+  const n={new:0,learn:0,done:0};
+  WORDS.forEach(w=>n[bucket(w.i)]++);
+  const T=WORDS.length;
+  $('#cNew').textContent=n.new; $('#cLearn').textContent=n.learn; $('#cDone').textContent=n.done;
+  $('#pgDone').style.width=(n.done/T*100)+'%';
+  $('#pgLearn').style.width=(n.learn/T*100)+'%';
+  $('#pgNew').style.width=(n.new/T*100)+'%';
+
+  const due=WORDS.filter(w=>isDue(w.i)).length;
+  $('#dueN').textContent=due;
+  $('#startReview').disabled = due===0;
+  $('#startReview').textContent = due===0 ? '今日の分は終わりました' : '復習を始める';
+
+  const s=streak();
+  const st=$('#streak');
+  st.classList.toggle('zero', s===0);
+  st.innerHTML=icon('flame')+'<span class="num">'+s+'</span>日';
+
+  const p=pool();
+  $('#poolInfo').textContent = !p.length ? '条件に合う単語がありません'
+    : ('出題対象 '+p.length+'語 / 全'+WORDS.length+'語')
+      + (ST.cfg.lessons.length ? '' : '（課を選んでいないので全課から出題します）');
+  $$('.mode').forEach(b=>b.disabled=!p.length);
+  $('#subtitle').textContent = WORDS.length+'語 · '+LESSONS.length+'課'+(memOnly?' · 保存できません':'');
+}
+function renderFilters(){
+  const lc=$('#lessonChips'); lc.innerHTML='';
+  LESSONS.forEach(l=>{
+    const b=document.createElement('button');
+    b.className='chip'+(ST.cfg.lessons.includes(l)?' on':'');
+    b.textContent='第'+l+'課';
+    b.onclick=()=>{
+      const i=ST.cfg.lessons.indexOf(l);
+      if(i<0) ST.cfg.lessons.push(l); else ST.cfg.lessons.splice(i,1);
+      save(); renderFilters(); renderHome();
+    };
+    lc.appendChild(b);
+  });
+  const pc=$('#posChips'); pc.innerHTML='';
+  POS.forEach(p=>{
+    const b=document.createElement('button');
+    b.className='chip'+(ST.cfg.pos.includes(p)?' on':'');
+    b.textContent=p;
+    b.onclick=()=>{
+      const i=ST.cfg.pos.indexOf(p);
+      if(i<0) ST.cfg.pos.push(p); else ST.cfg.pos.splice(i,1);
+      save(); renderFilters(); renderHome();
+    };
+    pc.appendChild(b);
+  });
+  sw($('#swStar'), ST.cfg.star, v=>{ ST.cfg.star=v; save(); renderFilters(); renderHome(); });
+}
+$('#lsAll').onclick=()=>{ ST.cfg.lessons=[...LESSONS]; save(); renderFilters(); renderHome(); };
+$('#lsNone').onclick=()=>{ ST.cfg.lessons=[]; save(); renderFilters(); renderHome(); };
+
+/* ---------- word list ---------- */
+let lf='all', shown=100;
+function renderList(){
+  const q=$('#q').value.trim().toLowerCase();
+  const arr=WORDS.filter(w=>{
+    if(q && !(w.k.toLowerCase().includes(q)||w.j.toLowerCase().includes(q))) return false;
+    if(lf==='star') return !!(peek(w.i)&&peek(w.i).st);
+    if(lf==='all') return true;
+    return bucket(w.i)===lf;
+  });
+  const box=$('#wlist'); box.innerHTML='';
+  if(!arr.length){ box.innerHTML='<div class="empty">該当する単語がありません</div>'; $('#more').hidden=true; return; }
+  arr.slice(0,shown).forEach(w=>{
+    const c=peek(w.i), b=bucket(w.i);
+    const col=b==='done'?'var(--ok)':b==='learn'?'var(--star)':'var(--line)';
+    const el=document.createElement('div'); el.className='w';
+    el.innerHTML='<i class="dot" style="background:'+col+'"></i>'+
+      '<div class="txt"><div class="ko">'+esc(w.k)+'<span class="tag">第'+w.l+'課</span></div>'+
+      '<div class="ja">'+esc(w.j)+(w.m?' · '+esc(w.m):'')+'</div></div>'+
+      '<button class="act sp" aria-label="読み上げ">'+icon('speaker')+'</button>'+
+      '<button class="act st'+((c&&c.st)?' on':'')+'" aria-label="スター">'+icon('star',(c&&c.st)?'fill':'')+'</button>';
+    el.querySelector('.sp').onclick=()=>speak(w.k);
+    el.querySelector('.st').onclick=e=>{
+      const cc=C(w.i); cc.st=cc.st?0:1; save();
+      const btn=e.currentTarget;
+      btn.classList.toggle('on', !!cc.st);
+      btn.innerHTML=icon('star', cc.st?'fill':'');
+    };
+    box.appendChild(el);
+  });
+  $('#more').hidden = arr.length<=shown;
+  $('#more').textContent='さらに表示（残り'+(arr.length-shown)+'語）';
+}
+$('#q').oninput=()=>{ shown=100; renderList(); };
+$('#more').onclick=()=>{ shown+=200; renderList(); };
+$$('[data-lf]').forEach(b=>b.onclick=()=>{
+  $$('[data-lf]').forEach(x=>x.classList.remove('on')); b.classList.add('on');
+  lf=b.dataset.lf; shown=100; renderList();
+});
+
+/* ---------- settings ---------- */
+function renderSet(){
+  seg('#segRound', ST.cfg.round, v=>{ ST.cfg.round=+v; save(); renderSet(); });
+  seg('#segDir', ST.cfg.dir, v=>{ ST.cfg.dir=v; save(); renderSet(); });
+  seg('#segRate', ST.cfg.rate, v=>{ ST.cfg.rate=+v; save(); renderSet(); speak('안녕하세요'); });
+  seg('#segTheme', ST.cfg.theme, v=>{ ST.cfg.theme=v; save(); applyTheme(); renderSet(); });
+  sw($('#swAuto'), ST.cfg.auto, v=>{ ST.cfg.auto=v; save(); renderSet(); });
+  const cards=Object.values(ST.cards);
+  const studied=cards.filter(c=>c.seen).length, starred=cards.filter(c=>c.st).length;
+  $('#dataInfo').innerHTML='学習した単語 '+studied+' 語　スター '+starred+' 語<br>学習した日数 '+Object.keys(ST.days).length+' 日　連続 '+streak()+' 日'
+    + (memOnly?'<br><b style="color:var(--no)">このブラウザでは進捗を保存できません</b>':'');
+}
+function applyTheme(){
+  const t=ST.cfg.theme;
+  if(t==='auto') document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.setAttribute('data-theme',t);
+}
+$('#testVoice').onclick=()=>speak('안녕하세요');
+$('#backup').onclick=()=>{
+  const blob=new Blob([JSON.stringify(ST)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download='korean-cards-backup-'+today()+'.json';
+  document.body.appendChild(a); a.click(); a.remove();
+};
+$('#restore').onclick=()=>$('#fileIn').click();
+$('#fileIn').onchange=e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const d=JSON.parse(r.result);
+      if(!d.cards) throw 0;
+      ST=Object.assign({}, DEF, d); ST.cfg=Object.assign({}, DEF.cfg, ST.cfg||{});
+      writeLS(JSON.stringify(ST)); applyTheme(); renderAll(); tell('進捗を復元しました');
+    }catch(err){ tell('このファイルは読み込めませんでした。\n書き出したバックアップ（.json）を選んでください。'); }
+  };
+  r.readAsText(f); e.target.value='';
+};
+$('#reset').onclick=async()=>{
+  if(!await ask('すべての進捗・スター・連続日数を消します。この操作は取り消せません。','すべて消す',true)) return;
+  ST={cards:{},days:{},cfg:ST.cfg}; writeLS(JSON.stringify(ST)); renderAll();
+};
+
+/* ---------- tabs ---------- */
+$$('.tabbar button').forEach(b=>b.onclick=()=>{
+  $$('.tabbar button').forEach(x=>x.classList.remove('on')); b.classList.add('on');
+  $$('.view').forEach(v=>v.classList.remove('on'));
+  $('#'+b.dataset.tab).classList.add('on');
+  window.scrollTo(0,0);
+  if(b.dataset.tab==='v-list') renderList();
+  if(b.dataset.tab==='v-set') renderSet();
+  if(b.dataset.tab==='v-study') renderHome();
+});
+
+/* ---------- session ---------- */
+let S=null, STAGE_HTML='';
+function buildQueue(reviewOnly){
+  const src = reviewOnly ? WORDS : pool();
+  const now=Date.now();
+  const due=[], fresh=[], later=[];
+  src.forEach(w=>{ const c=peek(w.i);
+    if(c&&c.seen){ (c.due<=now?due:later).push(w); } else fresh.push(w); });
+  shuffle(due); shuffle(fresh); shuffle(later);
+  const q = reviewOnly ? due : due.concat(fresh, later);
+  return q.slice(0, ST.cfg.round);
+}
+function sideFor(){
+  if(S.mode==='listen') return 'a';
+  if(ST.cfg.dir==='mix') return Math.random()<0.5?'k':'j';
+  return ST.cfg.dir;
+}
+function start(mode, reviewOnly){
+  const q=buildQueue(reviewOnly);
+  if(!q.length){ tell('出題できる単語がありません。\n出題範囲の課や品詞を選び直してください。'); return; }
+  S={mode, reviewOnly, list:q.map(w=>({w})), i:0, flip:false, ok:0, again:[]};
+  S.list.forEach(it=>it.side=sideFor());
+  $('#session').hidden=false;
+  document.body.style.overflow='hidden';
+  draw();
+}
+function end(){
+  $('#session').hidden=true; document.body.style.overflow='';
+  S=null; renderAll();
+}
+function draw(){
+  const it=S.list[S.i];
+  if(!it){ result(); return; }
+  const w=it.w, c=peek(w.i);
+  $('#sBar').style.width=(S.i/S.list.length*100)+'%';
+  $('#sCnt').textContent=(S.i+1)+'/'+S.list.length;
+  const starOn=!!(c&&c.st);
+  $('#sStar').classList.toggle('on', starOn);
+  $('#sStar').innerHTML=icon('star', starOn?'fill':'');
+  $('#sLesson').textContent='第'+w.l+'課'+(w.m?' · '+w.m:'');
+  $('#answers').style.display='grid';
+
+  const f=$('#face');
+  if(!S.flip){
+    if(it.side==='a'){
+      f.innerHTML='<div class="playbig" id="pb">'+icon('speaker')+'</div><div class="hint">タップして答えを見る</div>';
+      $('#pb').onclick=e=>{ e.stopPropagation(); pulse(); speak(w.k); };
+      pulse(); speak(w.k);
+    } else if(it.side==='k'){
+      f.innerHTML='<div class="big">'+esc(w.k)+'</div><div class="hint">タップして意味を見る</div>';
+      if(ST.cfg.auto) speak(w.k);
+    } else {
+      f.innerHTML='<div class="big ja">'+esc(w.j)+'</div><div class="hint">タップして韓国語を見る</div>';
+    }
+  } else {
+    f.innerHTML='<div class="big">'+esc(w.k)+'</div><div class="sm">'+esc(w.j)+'</div>';
+    if(ST.cfg.auto && it.side!=='k') speak(w.k);
+  }
+}
+function pulse(){ const p=$('#pb'); if(!p) return; p.classList.remove('on'); void p.offsetWidth; p.classList.add('on'); }
+function answer(good){
+  const it=S.list[S.i]; if(!it) return;
+  grade(it.w.i, good);
+  if(good) S.ok++; else S.again.push(it.w);
+  S.i++; S.flip=false;
+  draw();
+}
+function result(){
+  const total=S.list.length, ok=S.ok, ng=S.again.length;
+  const pct=Math.round(ok/total*100), CIRC=2*Math.PI*52;
+  $('#sBar').style.width='100%'; $('#sCnt').textContent=total+'/'+total;
+  $('#answers').style.display='none';
+  const st=$('#stage');
+  st.innerHTML='<div class="result">'+
+    '<div class="ring"><svg viewBox="0 0 120 120">'+
+      '<circle class="track" cx="60" cy="60" r="52"/>'+
+      '<circle class="val" cx="60" cy="60" r="52" style="stroke-dasharray:'+CIRC+';stroke-dashoffset:'+CIRC+'"/>'+
+    '</svg><div class="pct"><div><b>'+pct+'</b><span>%</span></div></div></div>'+
+    '<h2>ラウンド終了</h2>'+
+    '<div class="score">'+total+'語を学習しました</div>'+
+    '<div class="nums"><div><b style="color:var(--ok)">'+ok+'</b><span>覚えた</span></div>'+
+    '<div><b style="color:var(--no)">'+ng+'</b><span>まだ</span></div></div>'+
+    (ng?'<button class="btn p" id="rAgain">「まだ」の'+ng+'語をもう一度</button>':'')+
+    '<button class="btn g" id="rNext">続けてもう'+ST.cfg.round+'語</button>'+
+    '<button class="btn g" id="rHome">終わる</button></div>';
+  requestAnimationFrame(()=>{ const v=st.querySelector('.val'); if(v) v.style.strokeDashoffset=CIRC*(1-ok/total); });
+
+  const again=S.again.slice(), mode=S.mode, ro=S.reviewOnly;
+  if(ng) $('#rAgain').onclick=()=>{
+    restoreStage();
+    S={mode, reviewOnly:ro, list:shuffle(again).map(w=>({w})), i:0, flip:false, ok:0, again:[]};
+    S.list.forEach(x=>x.side=sideFor()); draw();
+  };
+  $('#rNext').onclick=()=>{ restoreStage(); start(mode, ro); };
+  $('#rHome').onclick=()=>{ restoreStage(); end(); };
+}
+function restoreStage(){ $('#stage').innerHTML=STAGE_HTML; bindCard(); }
+
+function bindCard(){
+  const card=$('#flip');
+  card.onclick=()=>{ if(S && !S.flip){ S.flip=true; draw(); } };
+  $('#sStar').onclick=e=>{ e.stopPropagation(); const it=S&&S.list[S.i]; if(!it) return;
+    const c=C(it.w.i); c.st=c.st?0:1; save(); draw(); };
+  $('#sSpeak').onclick=e=>{ e.stopPropagation(); const it=S&&S.list[S.i]; if(it) speak(it.w.k); };
+
+  let x0=null,y0=null,dx=0,drag=false;
+  card.addEventListener('touchstart',e=>{ x0=e.touches[0].clientX; y0=e.touches[0].clientY; dx=0; drag=false; },{passive:true});
+  card.addEventListener('touchmove',e=>{
+    if(x0===null) return;
+    dx=e.touches[0].clientX-x0;
+    const dy=e.touches[0].clientY-y0;
+    if(!drag && Math.abs(dx)>10 && Math.abs(dx)>Math.abs(dy)) drag=true;
+    if(!drag) return;
+    card.style.transition='none';
+    card.style.transform='translateX('+dx+'px) rotate('+(dx/22)+'deg)';
+    $('#jR').style.opacity = dx>0 ? Math.min(1, dx/90) : 0;
+    $('#jL').style.opacity = dx<0 ? Math.min(1, -dx/90) : 0;
+  },{passive:true});
+  card.addEventListener('touchend',()=>{
+    if(x0===null) return;
+    const moved=drag, d=dx;
+    x0=null; dx=0; drag=false;
+    card.style.transition='transform .2s ease';
+    card.style.transform=''; $('#jR').style.opacity=0; $('#jL').style.opacity=0;
+    if(moved && Math.abs(d)>80) answer(d>0);
+  });
+}
+$('#bOk').onclick=()=>answer(true);
+$('#bNg').onclick=()=>answer(false);
+$('#sClose').onclick=async()=>{
+  if(S && S.i>0 && S.i<S.list.length){
+    if(!await ask('学習を終了しますか？\nここまでの記録は保存されています。','終了する')) return;
+  }
+  end();
+};
+document.addEventListener('keydown',e=>{
+  if(!$('#modal').hidden){
+    if(e.key==='Escape') closeModal(false);
+    else if(e.key==='Enter') closeModal(true);
+    return;
+  }
+  if(!S || $('#session').hidden) return;
+  if(e.key===' '||e.key==='ArrowDown'){ e.preventDefault(); if(!S.flip){ S.flip=true; draw(); } }
+  else if(e.key==='ArrowRight') answer(true);
+  else if(e.key==='ArrowLeft') answer(false);
+  else if(e.key==='Escape') end();
+});
+
+/* ---------- boot ---------- */
+$('#startReview').onclick=()=>start('cards', true);
+$$('.mode').forEach(b=>b.onclick=()=>start(b.dataset.mode, false));
+function renderAll(){ renderHome(); renderFilters(); renderList(); renderSet(); }
+STAGE_HTML=$('#stage').innerHTML;
+bindCard();
+applyTheme();
+renderAll();
+</script>
+
+</body>
+</html>
