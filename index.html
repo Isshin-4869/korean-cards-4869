@@ -83,6 +83,7 @@ section.view.on{display:block}
 
 .panel{background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:16px; margin-bottom:14px}
 .panel h2{font-size:12px; color:var(--sub); font-weight:700; margin-bottom:13px; letter-spacing:.06em; text-transform:uppercase}
+.panel .note{font-size:11.5px; color:var(--sub); line-height:1.65; margin-top:12px}
 
 .bar{display:flex; height:10px; border-radius:999px; overflow:hidden; background:var(--sunk); margin-bottom:11px}
 .bar i{display:block; height:100%; transition:width .4s ease}
@@ -134,6 +135,51 @@ section.view.on{display:block}
 .btn.g{background:var(--raise); border:1px solid var(--line)}
 .btn.d{color:var(--no); background:var(--no-soft)}
 .btn+.btn{margin-top:9px}
+
+/* ===== 記録タブ ===== */
+.lvcard{background:var(--accent); color:var(--accent-ink); border-radius:var(--radius); padding:18px; margin-bottom:14px; box-shadow:var(--shadow)}
+.lvtop{display:flex; align-items:baseline; justify-content:space-between; gap:10px}
+.lvtop .n{font-size:40px; font-weight:800; line-height:1; font-variant-numeric:tabular-nums}
+.lvtop .n small{font-size:14px; font-weight:700; margin-right:4px; opacity:.8}
+.lvtop .rank{font-size:13px; font-weight:700; background:color-mix(in srgb, var(--accent-ink) 18%, transparent); padding:5px 12px; border-radius:999px}
+.lvbar{height:9px; border-radius:999px; background:color-mix(in srgb, var(--accent-ink) 22%, transparent); overflow:hidden; margin:15px 0 8px}
+.lvbar i{display:block; height:100%; background:var(--accent-ink); border-radius:999px; transition:width .5s ease}
+.lvfoot{display:flex; justify-content:space-between; font-size:11.5px; font-weight:600; opacity:.85; font-variant-numeric:tabular-nums}
+
+.calhead{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px}
+.calhead .m{font-size:15px; font-weight:700; font-variant-numeric:tabular-nums}
+.calhead button{width:32px; height:32px; border-radius:50%; display:grid; place-items:center; color:var(--sub); background:var(--sunk); font-size:14px}
+.calhead button:disabled{opacity:.3}
+.cal{display:grid; grid-template-columns:repeat(7,1fr); gap:5px}
+.cal .wd{text-align:center; font-size:10.5px; font-weight:700; color:var(--sub); padding-bottom:3px}
+.cal .wd.s0{color:var(--no)} .cal .wd.s6{color:var(--accent)}
+.cal .d{aspect-ratio:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px;
+  border-radius:10px; font-size:12px; font-weight:600; color:var(--sub); font-variant-numeric:tabular-nums}
+.cal .d.pad{visibility:hidden}
+.cal .d.l1{background:color-mix(in srgb, var(--accent) 22%, transparent); color:var(--text)}
+.cal .d.l2{background:color-mix(in srgb, var(--accent) 58%, transparent); color:#fff}
+.cal .d.l3{background:var(--accent); color:var(--accent-ink)}
+.cal .d.today{box-shadow:inset 0 0 0 2px var(--star)}
+.cal .ck{width:11px; height:11px; stroke:currentColor; stroke-width:3.2; fill:none; stroke-linecap:round; stroke-linejoin:round}
+.calkey{display:flex; align-items:center; justify-content:flex-end; gap:6px; font-size:10.5px; color:var(--sub); margin-top:11px}
+.calkey i{width:11px; height:11px; border-radius:3px; display:inline-block}
+
+.stats{display:grid; grid-template-columns:repeat(2,1fr); gap:10px}
+.stat{background:var(--sunk); border-radius:13px; padding:13px}
+.stat b{display:block; font-size:23px; font-weight:800; font-variant-numeric:tabular-nums; line-height:1.2}
+.stat span{font-size:11px; color:var(--sub); font-weight:600}
+
+.bignum{display:flex; align-items:baseline; gap:8px; margin-bottom:4px}
+.bignum b{font-size:38px; font-weight:800; font-variant-numeric:tabular-nums; line-height:1}
+.bignum span{font-size:13px; color:var(--sub); font-weight:600}
+.chart{width:100%; display:block; overflow:visible}
+.chart .grid{stroke:var(--line); stroke-width:1}
+.chart .axis{fill:var(--sub); font-size:9px; font-weight:600}
+.chart .curve{fill:none; stroke:var(--accent); stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round}
+.chart .area{fill:var(--accent); opacity:.12}
+.chart .ref{stroke:var(--star); stroke-width:1.5; stroke-dasharray:3 3}
+.chart .barr{fill:var(--accent); rx:2}
+.chart .barr.past{fill:var(--no)}
 
 .search{width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--line); background:var(--card); color:var(--text); font-size:16px; margin-bottom:11px}
 .search::placeholder{color:var(--sub)}
@@ -193,11 +239,17 @@ section.view.on{display:block}
 .judge{position:absolute; top:20px; font-size:15px; font-weight:800; padding:7px 15px; border-radius:10px; opacity:0}
 .judge.l{left:20px; color:var(--no); background:var(--no-soft); transform:rotate(-9deg)}
 .judge.r{right:20px; color:var(--ok); background:var(--ok-soft); transform:rotate(9deg)}
+.pop{position:absolute; left:50%; top:34%; transform:translateX(-50%); font-size:22px; font-weight:800; color:var(--star); pointer-events:none; opacity:0}
+.pop.go{animation:pop 1s ease}
+@keyframes pop{0%{opacity:0; transform:translate(-50%,10px)}25%{opacity:1}100%{opacity:0; transform:translate(-50%,-34px)}}
 
-.answers{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px}
-.answers button{padding:17px 10px; border-radius:15px; font-weight:800; font-size:16px}
+.answers{display:grid; gap:9px; margin-top:14px; grid-template-columns:1fr 1fr}
+.answers.three{grid-template-columns:1fr 1fr 1fr}
+.answers button{padding:16px 6px; border-radius:15px; font-weight:800; font-size:15.5px}
+.answers button .nx{display:block; font-size:10.5px; font-weight:600; opacity:.75; margin-top:3px; font-variant-numeric:tabular-nums}
 .answers .ng{background:var(--no-soft); color:var(--no)}
 .answers .okb{background:var(--ok-soft); color:var(--ok)}
+.answers .ez{background:var(--accent-soft); color:var(--accent)}
 .answers button:active{transform:scale(.97)}
 
 .result{text-align:center; padding:10px 0}
@@ -210,10 +262,12 @@ section.view.on{display:block}
 .ring .pct b{font-size:31px; font-weight:800; font-variant-numeric:tabular-nums; letter-spacing:-.02em}
 .ring .pct span{font-size:15px; font-weight:600; color:var(--sub); margin-left:2px}
 .result h2{font-size:21px; margin:14px 0 6px}
-.result .score{font-size:13.5px; color:var(--sub); margin-bottom:20px}
-.result .nums{display:flex; justify-content:center; gap:30px; margin:0 0 24px}
+.result .score{font-size:13.5px; color:var(--sub); margin-bottom:16px}
+.result .gain{display:inline-block; background:var(--accent-soft); color:var(--accent); font-size:15px; font-weight:800; padding:9px 18px; border-radius:999px; margin-bottom:18px; font-variant-numeric:tabular-nums}
+.result .lvup{background:var(--star); color:#1a1200; border-radius:14px; padding:13px; font-weight:800; font-size:15px; margin-bottom:18px}
+.result .nums{display:flex; justify-content:center; gap:26px; margin:0 0 22px}
 .result .nums div{text-align:center}
-.result .nums b{display:block; font-size:29px; font-weight:800; font-variant-numeric:tabular-nums}
+.result .nums b{display:block; font-size:28px; font-weight:800; font-variant-numeric:tabular-nums}
 .result .nums span{font-size:11.5px; color:var(--sub); font-weight:600}
 
 /* ===== modal ===== */
@@ -237,12 +291,15 @@ section.view.on{display:block}
 <symbol id="i-cards" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="12.5" height="14" rx="2.4"/><path d="M8.5 3.5h9A3 3 0 0 1 20.5 6.5v10"/></symbol>
 <symbol id="i-audio" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15.5v-3.7a8 8 0 0 1 16 0v3.7"/><rect x="2" y="14" width="4.6" height="7" rx="2.3"/><rect x="17.4" y="14" width="4.6" height="7" rx="2.3"/></symbol>
 <symbol id="i-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.6"/><circle cx="12" cy="12" r="4.4"/><circle cx="12" cy="12" r=".9" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 20.5h17"/><path d="M3.5 15.5c3.5 0 4.5-9 8-9s4.5 6 8 6"/><circle cx="19.5" cy="12.5" r="1.4" fill="currentColor" stroke="none"/></symbol>
 <symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11.5M9 12h11.5M9 18h11.5"/><circle cx="4.3" cy="6" r="1.35" fill="currentColor" stroke="none"/><circle cx="4.3" cy="12" r="1.35" fill="currentColor" stroke="none"/><circle cx="4.3" cy="18" r="1.35" fill="currentColor" stroke="none"/></symbol>
 <symbol id="i-sliders" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h9M17.5 8H21M3 16h4.5M13 16h8"/><circle cx="14.6" cy="8" r="2.6"/><circle cx="10.1" cy="16" r="2.6"/></symbol>
 <symbol id="i-speaker" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11.5 4.5 6.8 8.7H3.2v6.6h3.6l4.7 4.2z"/><path d="M15.6 9.2a4 4 0 0 1 0 5.6"/><path d="M18.4 6.2a8 8 0 0 1 0 11.6"/></symbol>
 <symbol id="i-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3.7 2.62 5.32 5.88.86-4.25 4.14 1 5.85L12 17.32 6.75 19.87l1-5.85L3.5 9.88l5.88-.86z"/></symbol>
 <symbol id="i-flame" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12.6 2.2c.3 3.5-.5 5.4-1.7 6.6-.9-.5-1.2-1.5-1.2-2.7C8 7.6 6.4 9.7 6.4 12.6c0 3.4 2.6 6 5.6 6s5.6-2.6 5.6-6c0-4.4-3-8-5-10.4Zm-.6 14.3c-1.3 0-2.3-1-2.3-2.4 0-1.2.7-2 1.6-3 .2.8.6 1.3 1.2 1.7.9.6 1.8 1 1.8 2.2 0 .8-1 1.5-2.3 1.5Z"/></symbol>
 <symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M6 6 18 18M18 6 6 18"/></symbol>
+<symbol id="i-prev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14.5 5-7 7 7 7"/></symbol>
+<symbol id="i-next" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9.5 5 7 7-7 7"/></symbol>
 </defs></svg>
 
 <div class="app">
@@ -268,7 +325,7 @@ section.view.on{display:block}
         <button class="mode" data-mode="cards">
           <svg class="ic"><use href="#i-cards"/></svg>
           <span class="t">単語カード</span>
-          <span class="d">タップでめくって<br>「覚えた／まだ」に仕分け</span>
+          <span class="d">タップでめくって<br>覚えているか判定する</span>
         </button>
         <button class="mode" data-mode="listen">
           <svg class="ic"><use href="#i-audio"/></svg>
@@ -291,6 +348,7 @@ section.view.on{display:block}
         <span><i class="dot" style="background:var(--star)"></i>学習中 <b id="cLearn">0</b></span>
         <span><i class="dot" style="background:var(--line)"></i>未学習 <b id="cNew">0</b></span>
       </div>
+      <div class="note">復習間隔が21日以上まで伸びた単語を「習得済み」としています。</div>
     </div>
 
     <div class="panel">
@@ -309,6 +367,65 @@ section.view.on{display:block}
         <div><div class="k">スターを付けた語だけ</div><div class="h">苦手な語だけを集中的に復習します</div></div>
         <button class="sw" id="swStar"></button>
       </div>
+    </div>
+  </section>
+
+  <!-- ========== 記録 ========== -->
+  <section class="view" id="v-rec">
+    <div class="lvcard">
+      <div class="lvtop">
+        <div class="n"><small>Lv.</small><span id="lvN">1</span></div>
+        <div class="rank" id="lvRank">入門</div>
+      </div>
+      <div class="lvbar"><i id="lvBar" style="width:0"></i></div>
+      <div class="lvfoot">
+        <span id="lvCur">0 / 200 pt</span>
+        <span id="lvTot">通算 0 pt</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>学習カレンダー</h2>
+      <div class="calhead">
+        <button id="calPrev" aria-label="前の月"><svg class="ic"><use href="#i-prev"/></svg></button>
+        <div class="m" id="calMonth">—</div>
+        <button id="calNext" aria-label="次の月"><svg class="ic"><use href="#i-next"/></svg></button>
+      </div>
+      <div class="cal" id="cal"></div>
+      <div class="calkey">
+        <span>少ない</span>
+        <i style="background:var(--sunk)"></i>
+        <i style="background:color-mix(in srgb, var(--accent) 25%, transparent)"></i>
+        <i style="background:color-mix(in srgb, var(--accent) 60%, transparent)"></i>
+        <i style="background:var(--accent)"></i>
+        <span>多い</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>記録</h2>
+      <div class="stats">
+        <div class="stat"><b id="stStreak">0</b><span>連続日数</span></div>
+        <div class="stat"><b id="stBest">0</b><span>最長連続</span></div>
+        <div class="stat"><b id="stDays">0</b><span>学習した日数</span></div>
+        <div class="stat"><b id="stAns">0</b><span>のべ回答数</span></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>記憶の定着（忘却曲線）</h2>
+      <div class="bignum"><b id="retNow">—</b><span>いまの平均定着率</span></div>
+      <svg class="chart" id="chForget" viewBox="0 0 320 120" preserveAspectRatio="none" height="120"></svg>
+      <div class="note">
+        学習した単語を<b>これから復習しなかった場合</b>に、思い出せる確率がどう下がっていくかの予測です。
+        点線は90%のライン。このアプリは、各単語がこの線を割りそうな日を復習日として出しています。
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>これからの復習予定</h2>
+      <svg class="chart" id="chDue" viewBox="0 0 320 110" preserveAspectRatio="none" height="110"></svg>
+      <div class="note" id="dueNote">—</div>
     </div>
   </section>
 
@@ -341,6 +458,12 @@ section.view.on{display:block}
         <div><div class="k">出題の向き</div><div class="h">単語カードで最初に見せる面</div></div>
         <div class="seg" id="segDir">
           <button data-v="mix">両方</button><button data-v="k">韓→日</button><button data-v="j">日→韓</button>
+        </div>
+      </div>
+      <div class="field">
+        <div><div class="k">判定ボタン</div><div class="h">「かんたん」を使うと復習間隔が速く伸びます</div></div>
+        <div class="seg" id="segBtn">
+          <button data-v="2">2つ</button><button data-v="3">3つ</button>
         </div>
       </div>
     </div>
@@ -388,6 +511,7 @@ section.view.on{display:block}
 
   <nav class="tabbar">
     <button data-tab="v-study" class="on"><svg class="ic"><use href="#i-target"/></svg>学習</button>
+    <button data-tab="v-rec"><svg class="ic"><use href="#i-chart"/></svg>記録</button>
     <button data-tab="v-list"><svg class="ic"><use href="#i-book"/></svg>単語</button>
     <button data-tab="v-set"><svg class="ic"><use href="#i-sliders"/></svg>設定</button>
   </nav>
@@ -409,14 +533,16 @@ section.view.on{display:block}
       </div>
       <div class="judge l" id="jL">まだ</div>
       <div class="judge r" id="jR">覚えた</div>
+      <div class="pop" id="pop"></div>
       <div class="face" id="face"></div>
       <div class="lesson" id="sLesson"></div>
     </div>
   </div>
 
   <div class="answers" id="answers">
-    <button class="ng" id="bNg">まだ</button>
-    <button class="okb" id="bOk">覚えた</button>
+    <button class="ng" id="bNg">まだ<span class="nx" id="nxNg"></span></button>
+    <button class="okb" id="bOk">覚えた<span class="nx" id="nxOk"></span></button>
+    <button class="ez" id="bEz">かんたん<span class="nx" id="nxEz"></span></button>
   </div>
 </div>
 
@@ -438,37 +564,91 @@ let memOnly=false;
 function readLS(){ try{ return localStorage.getItem(KEY); }catch(e){ memOnly=true; return null; } }
 function writeLS(v){ try{ localStorage.setItem(KEY,v); }catch(e){ memOnly=true; } }
 
-const DEF={ cards:{}, days:{},
-  cfg:{ lessons:[1], pos:[], star:false, round:20, dir:'mix', rate:0.85, auto:true, theme:'auto' } };
-let ST=DEF;
-try{ const r=readLS(); if(r) ST=Object.assign({}, DEF, JSON.parse(r)); }catch(e){}
-ST.cfg=Object.assign({}, DEF.cfg, ST.cfg||{});
-ST.cards=ST.cards||{}; ST.days=ST.days||{};
+const DEFCFG={ lessons:[1], pos:[], star:false, round:20, dir:'mix', rate:0.85, auto:true, theme:'auto', btn:3 };
+const DEF={ v:2, cards:{}, days:{}, pt:0, cfg:DEFCFG };
+
+/* v1（レベル制）→ v2（SM-2）へのデータ移行。進捗と学習日は引き継ぐ */
+function migrate(s){
+  if(!s || typeof s!=='object') return JSON.parse(JSON.stringify(DEF));
+  if(s.v>=2){
+    s.cfg=Object.assign({}, DEFCFG, s.cfg||{});
+    s.cards=s.cards||{}; s.days=s.days||{}; s.pt=s.pt||0;
+    return s;
+  }
+  const IV=[0, 0.007, 0.33, 1, 3, 7, 16, 35];
+  const out={ v:2, cards:{}, days:{}, pt:0, cfg:Object.assign({}, DEFCFG, s.cfg||{}) };
+  for(const id in (s.cards||{})){
+    const c=s.cards[id], lv=Math.min(c.lv||0, 7);
+    out.cards[id]={ ef:2.5, reps:Math.max(0,Math.min(lv,6)), iv:IV[lv],
+      due:c.due||0, last:c.due?(c.due - IV[lv]*864e5):0,
+      seen:c.seen||0, ok:c.ok||0, ng:c.ng||0, st:c.st||0, lapses:0 };
+  }
+  for(const d in (s.days||{})){
+    const raw=s.days[d], n=typeof raw==='number'?raw:(raw&&raw.n)||0;
+    out.days[d]={n:n, p:n*10}; out.pt+=n*10;
+  }
+  return out;
+}
+let ST;
+try{ ST=migrate(JSON.parse(readLS()||'null')); }catch(e){ ST=migrate(null); }
+writeLS(JSON.stringify(ST));   // 移行結果をすぐ確定させる
 
 let saveT=null;
 function save(){ clearTimeout(saveT); saveT=setTimeout(()=>writeLS(JSON.stringify(ST)),250); }
 
 /* ---------- model ---------- */
-const DAY=864e5;
-const INT=[0, 10*60e3, 8*36e5, 1*DAY, 3*DAY, 7*DAY, 16*DAY, 35*DAY];
+const DAY=864e5, MATURE=21;
 const POS=['名詞','動詞','形容詞','副詞','助詞','表現','数詞','その他'];
 const LESSONS=[...new Set(WORDS.map(w=>w.l))].sort((a,b)=>a-b);
 const icon=(n,c)=>'<svg class="ic'+(c?' '+c:'')+'"><use href="#i-'+n+'"/></svg>';
 
-function C(id){ return ST.cards[id] || (ST.cards[id]={lv:0,due:0,seen:0,ok:0,ng:0,st:0}); }
+function C(id){ return ST.cards[id] || (ST.cards[id]={ef:2.5,reps:0,iv:0,due:0,last:0,seen:0,ok:0,ng:0,st:0,lapses:0}); }
 function peek(id){ return ST.cards[id]; }
-function bucket(id){ const c=peek(id); if(!c||!c.seen) return 'new'; return c.lv>=3?'done':'learn'; }
+function bucket(id){ const c=peek(id); if(!c||!c.seen) return 'new'; return c.iv>=MATURE?'done':'learn'; }
 function isDue(id){ const c=peek(id); return !!(c&&c.seen&&c.due<=Date.now()); }
 function dstr(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function today(){ return dstr(new Date()); }
 
-function grade(id, good){
-  const c=C(id); c.seen=1;
-  if(good){ c.lv=Math.min(INT.length-1, c.lv+1); c.ok++; }
-  else { c.lv=Math.max(0, c.lv-2); c.ng++; }
-  c.due=Date.now()+INT[c.lv];
-  const t=today(); ST.days[t]=(ST.days[t]||0)+1;
-  save();
+/* SuperMemo SM-2。q=2:まだ / 4:覚えた / 5:かんたん */
+const QUAL={again:2, good:4, easy:5};
+function nextIv(c, key){
+  const q=QUAL[key];
+  if(q<3) return 0;
+  const ez = key==='easy';
+  const reps=c.reps+1;
+  if(reps===1) return ez?4:1;      // 初回は 1日（かんたんなら4日）
+  if(reps===2) return ez?10:6;     // 2回目は 6日（かんたんなら10日）
+  return Math.min(Math.round(c.iv*c.ef*(ez?1.3:1)), 730);
+}
+function review(id, key){
+  const c=C(id), q=QUAL[key], now=Date.now();
+  const wasDue = !!(c.seen && c.due<=now), wasMature = c.seen && c.iv>=MATURE;
+  c.seen=1;
+  if(q<3){
+    c.reps=0; c.iv=0; c.lapses++; c.ng++;
+    c.due=now+10*60e3;                       // 忘れた語は10分後に再挑戦
+  }else{
+    c.iv=nextIv(c,key); c.reps++; c.ok++;
+    c.ef=Math.max(1.3, Math.round((c.ef + (0.1-(5-q)*(0.08+(5-q)*0.02)))*1000)/1000);
+    c.due=now+c.iv*DAY;
+  }
+  c.last=now;
+  let p = key==='again'?4 : key==='good'?10 : 12;
+  if(wasDue) p+=5;                                        // 期日どおりの復習にボーナス
+  if(!wasMature && c.iv>=MATURE) p+=25;                   // 新たに習得済みへ
+  addPoints(p, 1);
+  return p;
+}
+function addPoints(p, n){
+  const t=today();
+  const d=ST.days[t] || (ST.days[t]={n:0,p:0});
+  d.n+=n||0; d.p+=p; ST.pt+=p; save();
+}
+/* FSRSの冪関数型忘却曲線。t=S（＝現在の復習間隔）で定着率90%になる */
+function retr(c, at){
+  if(!c || !c.seen || !c.last) return null;
+  const S=Math.max(c.iv||0.3, 0.3), t=Math.max(0,(at-c.last)/DAY);
+  return Math.pow(1 + (19/81)*t/S, -0.5);
 }
 function streak(){
   let n=0; const d=new Date();
@@ -480,6 +660,23 @@ function streak(){
   }
   return n;
 }
+function bestStreak(){
+  const ks=Object.keys(ST.days).sort();
+  let best=0, run=0, prev=null;
+  for(const k of ks){
+    const d=new Date(k+'T00:00:00');
+    run = (prev && (d-prev)===DAY) ? run+1 : 1;
+    best=Math.max(best,run); prev=d;
+  }
+  return best;
+}
+function level(pt){
+  let lv=1, need=200, acc=0;
+  while(pt>=acc+need && lv<300){ acc+=need; lv++; need=Math.round(need*1.15); }
+  return {lv, cur:pt-acc, need};
+}
+const RANK=lv=> lv>=30?'達人' : lv>=18?'上級' : lv>=10?'中級' : lv>=5?'初級' : '入門';
+
 function pool(){
   const {lessons,pos,star}=ST.cfg;
   return WORDS.filter(w=>
@@ -522,9 +719,14 @@ function seg(sel, val, fn){
   });
 }
 function sw(el, on, fn){ el.classList.toggle('on', !!on); el.onclick=()=>fn(!el.classList.contains('on')); }
+function ivText(d){
+  if(!d) return '10分後';
+  if(d<1) return Math.round(d*24)+'時間後';
+  if(d<30) return Math.round(d)+'日後';
+  if(d<365) return Math.round(d/30.4)+'か月後';
+  return (Math.round(d/36.5)/10)+'年後';
+}
 
-/* 自前の確認ダイアログ。ブラウザ標準の confirm/alert は表示環境によって
-   ブロックされ、押しても何も起きなくなるため使わない */
 let mDone=null;
 function openModal(text, yes, showNo, danger){
   return new Promise(res=>{
@@ -559,8 +761,7 @@ function renderHome(){
   $('#startReview').disabled = due===0;
   $('#startReview').textContent = due===0 ? '今日の分は終わりました' : '復習を始める';
 
-  const s=streak();
-  const st=$('#streak');
+  const s=streak(), st=$('#streak');
   st.classList.toggle('zero', s===0);
   st.innerHTML=icon('flame')+'<span class="num">'+s+'</span>日';
 
@@ -569,7 +770,8 @@ function renderHome(){
     : ('出題対象 '+p.length+'語 / 全'+WORDS.length+'語')
       + (ST.cfg.lessons.length ? '' : '（課を選んでいないので全課から出題します）');
   $$('.mode').forEach(b=>b.disabled=!p.length);
-  $('#subtitle').textContent = WORDS.length+'語 · '+LESSONS.length+'課'+(memOnly?' · 保存できません':'');
+  const L=level(ST.pt);
+  $('#subtitle').textContent = 'Lv.'+L.lv+' '+RANK(L.lv)+' · '+ST.pt.toLocaleString()+'pt'+(memOnly?' · 保存できません':'');
 }
 function renderFilters(){
   const lc=$('#lessonChips'); lc.innerHTML='';
@@ -601,6 +803,114 @@ function renderFilters(){
 $('#lsAll').onclick=()=>{ ST.cfg.lessons=[...LESSONS]; save(); renderFilters(); renderHome(); };
 $('#lsNone').onclick=()=>{ ST.cfg.lessons=[]; save(); renderFilters(); renderHome(); };
 
+/* ---------- 記録タブ ---------- */
+let calM=new Date(); calM.setDate(1);
+function renderRec(){
+  const L=level(ST.pt);
+  $('#lvN').textContent=L.lv;
+  $('#lvRank').textContent=RANK(L.lv);
+  $('#lvBar').style.width=(L.cur/L.need*100)+'%';
+  $('#lvCur').textContent=L.cur.toLocaleString()+' / '+L.need.toLocaleString()+' pt';
+  $('#lvTot').textContent='通算 '+ST.pt.toLocaleString()+' pt';
+
+  renderCal();
+
+  const days=Object.keys(ST.days);
+  let ans=0; days.forEach(k=>ans+=(ST.days[k].n||0));
+  $('#stStreak').textContent=streak();
+  $('#stBest').textContent=bestStreak();
+  $('#stDays').textContent=days.length;
+  $('#stAns').textContent=ans.toLocaleString();
+
+  renderForget();
+  renderDue();
+}
+function renderCal(){
+  const y=calM.getFullYear(), m=calM.getMonth();
+  $('#calMonth').textContent=y+'年 '+(m+1)+'月';
+  const now=new Date(); now.setHours(0,0,0,0);
+  const nextM=new Date(y,m+1,1);
+  $('#calNext').disabled = nextM>now;
+
+  const box=$('#cal'); box.innerHTML='';
+  ['日','月','火','水','木','金','土'].forEach((w,i)=>{
+    const e=document.createElement('div'); e.className='wd s'+i; e.textContent=w; box.appendChild(e);
+  });
+  const first=new Date(y,m,1).getDay(), last=new Date(y,m+1,0).getDate();
+  for(let i=0;i<first;i++){ const e=document.createElement('div'); e.className='d pad'; box.appendChild(e); }
+  for(let d=1;d<=last;d++){
+    const key=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const rec=ST.days[key], n=rec?rec.n:0;
+    const e=document.createElement('div');
+    e.className='d'+(n>=30?' l3':n>=15?' l2':n>0?' l1':'')+(key===today()?' today':'');
+    e.innerHTML='<span>'+d+'</span>'+(n?'<svg class="ck" viewBox="0 0 24 24"><path d="m4 13 6 6L20 5"/></svg>':'');
+    if(n) e.title=n+'語 / '+rec.p+'pt';
+    box.appendChild(e);
+  }
+}
+$('#calPrev').onclick=()=>{ calM.setMonth(calM.getMonth()-1); renderCal(); };
+$('#calNext').onclick=()=>{ calM.setMonth(calM.getMonth()+1); renderCal(); };
+
+function seenCards(){
+  const out=[];
+  for(const id in ST.cards){ const c=ST.cards[id]; if(c.seen && c.last) out.push(c); }
+  return out;
+}
+function renderForget(){
+  const cs=seenCards(), svg=$('#chForget'), W=320,H=120, PL=26,PR=6,PT=8,PB=18;
+  if(!cs.length){
+    $('#retNow').textContent='—';
+    svg.innerHTML='<text x="160" y="64" text-anchor="middle" class="axis">まだ学習した単語がありません</text>';
+    return;
+  }
+  const now=Date.now(), DAYS=30, pts=[];
+  for(let d=0; d<=DAYS; d++){
+    let s=0; const at=now+d*DAY;
+    for(const c of cs) s+=retr(c, at);
+    pts.push(s/cs.length);
+  }
+  $('#retNow').textContent=Math.round(pts[0]*100)+'%';
+  const X=d=>PL+(W-PL-PR)*(d/DAYS), Y=r=>PT+(H-PT-PB)*(1-r);
+  let line='', area='M'+X(0)+','+Y(0)+' ';
+  pts.forEach((r,d)=>{ const cmd=(d?'L':'M')+X(d)+','+Y(r)+' '; line+=cmd; area+=(d?'L':'L')+X(d)+','+Y(r)+' '; });
+  area+='L'+X(DAYS)+','+Y(0)+' Z';
+  let g='';
+  [0,0.5,0.9,1].forEach(r=>{
+    g+='<line class="grid" x1="'+PL+'" y1="'+Y(r)+'" x2="'+(W-PR)+'" y2="'+Y(r)+'"/>';
+    g+='<text class="axis" x="'+(PL-4)+'" y="'+(Y(r)+3)+'" text-anchor="end">'+Math.round(r*100)+'</text>';
+  });
+  g+='<line class="ref" x1="'+PL+'" y1="'+Y(0.9)+'" x2="'+(W-PR)+'" y2="'+Y(0.9)+'"/>';
+  let lab='';
+  [0,7,14,21,30].forEach(d=>{ lab+='<text class="axis" x="'+X(d)+'" y="'+(H-5)+'" text-anchor="middle">'+(d?d+'日':'今日')+'</text>'; });
+  svg.innerHTML=g+'<path class="area" d="'+area+'"/><path class="curve" d="'+line+'"/>'+lab+
+    '<circle cx="'+X(0)+'" cy="'+Y(pts[0])+'" r="3.5" fill="var(--accent)"/>';
+}
+function renderDue(){
+  const svg=$('#chDue'), W=320,H=110, PL=22,PR=6,PT=8,PB=18, N=14;
+  const now=new Date(); now.setHours(0,0,0,0);
+  const buck=new Array(N).fill(0); let over=0;
+  for(const id in ST.cards){
+    const c=ST.cards[id]; if(!c.seen) continue;
+    const d=Math.floor((c.due-now.getTime())/DAY);
+    if(d<0) over++; else if(d<N) buck[d]++;
+  }
+  buck[0]+=over;
+  const max=Math.max(1,...buck);
+  const bw=(W-PL-PR)/N;
+  let bars='', lab='';
+  buck.forEach((v,i)=>{
+    const h=(H-PT-PB)*(v/max), x=PL+bw*i+2, y=H-PB-h;
+    bars+='<rect class="barr'+(i===0&&over?' past':'')+'" x="'+x+'" y="'+y+'" width="'+(bw-4)+'" height="'+Math.max(v?2:0,h)+'" rx="2"/>';
+    if(v) bars+='<text class="axis" x="'+(x+(bw-4)/2)+'" y="'+(y-3)+'" text-anchor="middle">'+v+'</text>';
+    if(i%3===0) lab+='<text class="axis" x="'+(x+(bw-4)/2)+'" y="'+(H-5)+'" text-anchor="middle">'+(i?i+'日':'今日')+'</text>';
+  });
+  svg.innerHTML='<line class="grid" x1="'+PL+'" y1="'+(H-PB)+'" x2="'+(W-PR)+'" y2="'+(H-PB)+'"/>'+bars+lab;
+  const tot=buck.reduce((a,b)=>a+b,0);
+  $('#dueNote').textContent = tot===0
+    ? '予定されている復習はまだありません。単語カードを進めると、忘れそうな日に自動で並びます。'
+    : ('今後14日で '+tot+' 語の復習予定があります。'+(over?'（うち '+over+' 語は期限を過ぎています）':''));
+}
+
 /* ---------- word list ---------- */
 let lf='all', shown=100;
 function renderList(){
@@ -617,9 +927,10 @@ function renderList(){
     const c=peek(w.i), b=bucket(w.i);
     const col=b==='done'?'var(--ok)':b==='learn'?'var(--star)':'var(--line)';
     const el=document.createElement('div'); el.className='w';
+    const meta = c&&c.seen ? '次回 '+ivText(c.iv) : (w.m||'');
     el.innerHTML='<i class="dot" style="background:'+col+'"></i>'+
       '<div class="txt"><div class="ko">'+esc(w.k)+'<span class="tag">第'+w.l+'課</span></div>'+
-      '<div class="ja">'+esc(w.j)+(w.m?' · '+esc(w.m):'')+'</div></div>'+
+      '<div class="ja">'+esc(w.j)+(meta?' · '+esc(meta):'')+'</div></div>'+
       '<button class="act sp" aria-label="読み上げ">'+icon('speaker')+'</button>'+
       '<button class="act st'+((c&&c.st)?' on':'')+'" aria-label="スター">'+icon('star',(c&&c.st)?'fill':'')+'</button>';
     el.querySelector('.sp').onclick=()=>speak(w.k);
@@ -645,12 +956,16 @@ $$('[data-lf]').forEach(b=>b.onclick=()=>{
 function renderSet(){
   seg('#segRound', ST.cfg.round, v=>{ ST.cfg.round=+v; save(); renderSet(); });
   seg('#segDir', ST.cfg.dir, v=>{ ST.cfg.dir=v; save(); renderSet(); });
+  seg('#segBtn', ST.cfg.btn, v=>{ ST.cfg.btn=+v; save(); renderSet(); });
   seg('#segRate', ST.cfg.rate, v=>{ ST.cfg.rate=+v; save(); renderSet(); speak('안녕하세요'); });
   seg('#segTheme', ST.cfg.theme, v=>{ ST.cfg.theme=v; save(); applyTheme(); renderSet(); });
   sw($('#swAuto'), ST.cfg.auto, v=>{ ST.cfg.auto=v; save(); renderSet(); });
   const cards=Object.values(ST.cards);
   const studied=cards.filter(c=>c.seen).length, starred=cards.filter(c=>c.st).length;
-  $('#dataInfo').innerHTML='学習した単語 '+studied+' 語　スター '+starred+' 語<br>学習した日数 '+Object.keys(ST.days).length+' 日　連続 '+streak()+' 日'
+  const L=level(ST.pt);
+  $('#dataInfo').innerHTML='学習した単語 '+studied+' 語　スター '+starred+' 語<br>'
+    +'Lv.'+L.lv+' '+RANK(L.lv)+'　通算 '+ST.pt.toLocaleString()+' pt<br>'
+    +'学習した日数 '+Object.keys(ST.days).length+' 日　連続 '+streak()+' 日'
     + (memOnly?'<br><b style="color:var(--no)">このブラウザでは進捗を保存できません</b>':'');
 }
 function applyTheme(){
@@ -662,7 +977,7 @@ $('#testVoice').onclick=()=>speak('안녕하세요');
 $('#backup').onclick=()=>{
   const blob=new Blob([JSON.stringify(ST)],{type:'application/json'});
   const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob); a.download='korean-cards-backup-'+today()+'.json';
+  a.href=URL.createObjectURL(blob); a.download='まいにちハングル-'+today()+'.json';
   document.body.appendChild(a); a.click(); a.remove();
 };
 $('#restore').onclick=()=>$('#fileIn').click();
@@ -673,15 +988,15 @@ $('#fileIn').onchange=e=>{
     try{
       const d=JSON.parse(r.result);
       if(!d.cards) throw 0;
-      ST=Object.assign({}, DEF, d); ST.cfg=Object.assign({}, DEF.cfg, ST.cfg||{});
+      ST=migrate(d);
       writeLS(JSON.stringify(ST)); applyTheme(); renderAll(); tell('進捗を復元しました');
     }catch(err){ tell('このファイルは読み込めませんでした。\n書き出したバックアップ（.json）を選んでください。'); }
   };
   r.readAsText(f); e.target.value='';
 };
 $('#reset').onclick=async()=>{
-  if(!await ask('すべての進捗・スター・連続日数を消します。この操作は取り消せません。','すべて消す',true)) return;
-  ST={cards:{},days:{},cfg:ST.cfg}; writeLS(JSON.stringify(ST)); renderAll();
+  if(!await ask('すべての進捗・スター・ポイント・連続日数を消します。この操作は取り消せません。','すべて消す',true)) return;
+  ST={v:2, cards:{}, days:{}, pt:0, cfg:ST.cfg}; writeLS(JSON.stringify(ST)); renderAll();
 };
 
 /* ---------- tabs ---------- */
@@ -690,9 +1005,10 @@ $$('.tabbar button').forEach(b=>b.onclick=()=>{
   $$('.view').forEach(v=>v.classList.remove('on'));
   $('#'+b.dataset.tab).classList.add('on');
   window.scrollTo(0,0);
+  if(b.dataset.tab==='v-rec')  renderRec();
   if(b.dataset.tab==='v-list') renderList();
-  if(b.dataset.tab==='v-set') renderSet();
-  if(b.dataset.tab==='v-study') renderHome();
+  if(b.dataset.tab==='v-set')  renderSet();
+  if(b.dataset.tab==='v-study')renderHome();
 });
 
 /* ---------- session ---------- */
@@ -715,8 +1031,12 @@ function sideFor(){
 function start(mode, reviewOnly){
   const q=buildQueue(reviewOnly);
   if(!q.length){ tell('出題できる単語がありません。\n出題範囲の課や品詞を選び直してください。'); return; }
-  S={mode, reviewOnly, list:q.map(w=>({w})), i:0, flip:false, ok:0, again:[]};
+  if(!ST.days[today()]) addPoints(30, 0);          // その日の初回セッションにボーナス
+  const before=level(ST.pt).lv;
+  S={mode, reviewOnly, list:q.map(w=>({w})), i:0, flip:false, ok:0, again:[], pt:0, lv0:before};
   S.list.forEach(it=>it.side=sideFor());
+  $('#answers').classList.toggle('three', ST.cfg.btn===3);
+  $('#bEz').hidden = ST.cfg.btn!==3;
   $('#session').hidden=false;
   document.body.style.overflow='hidden';
   draw();
@@ -737,6 +1057,11 @@ function draw(){
   $('#sLesson').textContent='第'+w.l+'課'+(w.m?' · '+w.m:'');
   $('#answers').style.display='grid';
 
+  const base=c||{ef:2.5,reps:0,iv:0};
+  $('#nxNg').textContent=ivText(0);
+  $('#nxOk').textContent=ivText(nextIv(base,'good'));
+  $('#nxEz').textContent=ivText(nextIv(base,'easy'));
+
   const f=$('#face');
   if(!S.flip){
     if(it.side==='a'){
@@ -755,16 +1080,23 @@ function draw(){
   }
 }
 function pulse(){ const p=$('#pb'); if(!p) return; p.classList.remove('on'); void p.offsetWidth; p.classList.add('on'); }
-function answer(good){
+function popPt(p){
+  const e=$('#pop'); if(!e) return;
+  e.textContent='+'+p;
+  e.classList.remove('go'); void e.offsetWidth; e.classList.add('go');
+}
+function answer(key){
   const it=S.list[S.i]; if(!it) return;
-  grade(it.w.i, good);
-  if(good) S.ok++; else S.again.push(it.w);
+  const p=review(it.w.i, key);
+  S.pt+=p; popPt(p);
+  if(key==='again') S.again.push(it.w); else S.ok++;
   S.i++; S.flip=false;
   draw();
 }
 function result(){
   const total=S.list.length, ok=S.ok, ng=S.again.length;
   const pct=Math.round(ok/total*100), CIRC=2*Math.PI*52;
+  const L=level(ST.pt), up=L.lv>S.lv0;
   $('#sBar').style.width='100%'; $('#sCnt').textContent=total+'/'+total;
   $('#answers').style.display='none';
   const st=$('#stage');
@@ -775,6 +1107,8 @@ function result(){
     '</svg><div class="pct"><div><b>'+pct+'</b><span>%</span></div></div></div>'+
     '<h2>ラウンド終了</h2>'+
     '<div class="score">'+total+'語を学習しました</div>'+
+    '<div class="gain">+'+S.pt+' pt</div>'+
+    (up?'<div class="lvup">レベルアップ！ Lv.'+L.lv+' '+RANK(L.lv)+'</div>':'')+
     '<div class="nums"><div><b style="color:var(--ok)">'+ok+'</b><span>覚えた</span></div>'+
     '<div><b style="color:var(--no)">'+ng+'</b><span>まだ</span></div></div>'+
     (ng?'<button class="btn p" id="rAgain">「まだ」の'+ng+'語をもう一度</button>':'')+
@@ -785,7 +1119,7 @@ function result(){
   const again=S.again.slice(), mode=S.mode, ro=S.reviewOnly;
   if(ng) $('#rAgain').onclick=()=>{
     restoreStage();
-    S={mode, reviewOnly:ro, list:shuffle(again).map(w=>({w})), i:0, flip:false, ok:0, again:[]};
+    S={mode, reviewOnly:ro, list:shuffle(again).map(w=>({w})), i:0, flip:false, ok:0, again:[], pt:0, lv0:level(ST.pt).lv};
     S.list.forEach(x=>x.side=sideFor()); draw();
   };
   $('#rNext').onclick=()=>{ restoreStage(); start(mode, ro); };
@@ -819,14 +1153,15 @@ function bindCard(){
     x0=null; dx=0; drag=false;
     card.style.transition='transform .2s ease';
     card.style.transform=''; $('#jR').style.opacity=0; $('#jL').style.opacity=0;
-    if(moved && Math.abs(d)>80) answer(d>0);
+    if(moved && Math.abs(d)>80) answer(d>0?'good':'again');
   });
 }
-$('#bOk').onclick=()=>answer(true);
-$('#bNg').onclick=()=>answer(false);
+$('#bNg').onclick=()=>answer('again');
+$('#bOk').onclick=()=>answer('good');
+$('#bEz').onclick=()=>answer('easy');
 $('#sClose').onclick=async()=>{
   if(S && S.i>0 && S.i<S.list.length){
-    if(!await ask('学習を終了しますか？\nここまでの記録は保存されています。','終了する')) return;
+    if(!await ask('学習を終了しますか？\nここまでの記録とポイントは保存されています。','終了する')) return;
   }
   end();
 };
@@ -838,15 +1173,19 @@ document.addEventListener('keydown',e=>{
   }
   if(!S || $('#session').hidden) return;
   if(e.key===' '||e.key==='ArrowDown'){ e.preventDefault(); if(!S.flip){ S.flip=true; draw(); } }
-  else if(e.key==='ArrowRight') answer(true);
-  else if(e.key==='ArrowLeft') answer(false);
+  else if(e.key==='ArrowRight') answer('good');
+  else if(e.key==='ArrowLeft') answer('again');
+  else if(e.key==='ArrowUp' && ST.cfg.btn===3){ e.preventDefault(); answer('easy'); }
   else if(e.key==='Escape') end();
 });
 
 /* ---------- boot ---------- */
 $('#startReview').onclick=()=>start('cards', true);
 $$('.mode').forEach(b=>b.onclick=()=>start(b.dataset.mode, false));
-function renderAll(){ renderHome(); renderFilters(); renderList(); renderSet(); }
+function renderAll(){
+  renderHome(); renderFilters(); renderList(); renderSet();
+  if($('#v-rec').classList.contains('on')) renderRec();
+}
 STAGE_HTML=$('#stage').innerHTML;
 bindCard();
 applyTheme();
