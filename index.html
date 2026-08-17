@@ -104,6 +104,10 @@ section.view.on{display:block}
 }
 .review button:disabled{opacity:.6}
 
+.resume{border:1px solid var(--star)}
+.resume .rtext{font-size:14.5px; font-weight:600; line-height:1.6; margin-bottom:13px}
+.resume .rtext b{font-size:19px; font-variant-numeric:tabular-nums; color:var(--star)}
+
 .modes{display:grid; grid-template-columns:1fr 1fr; gap:10px}
 .mode{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:15px 14px; text-align:left; box-shadow:var(--shadow)}
 .mode .ic{font-size:23px; color:var(--accent); margin-bottom:9px}
@@ -314,6 +318,14 @@ section.view.on{display:block}
 
   <!-- ========== 学習 ========== -->
   <section class="view on" id="v-study">
+    <div class="panel resume" id="resumeBox" hidden>
+      <h2>途中の学習</h2>
+      <div class="rtext" id="resumeText">—</div>
+      <button class="btn p" id="btnResume">続きから再開</button>
+      <button class="btn g" id="btnDrop">この続きを捨てる</button>
+      <div class="note">別のモードを始めると、この続きは消えます。回答した分の記録はすでに保存されています。</div>
+    </div>
+
     <div class="review">
       <div class="lbl">今日の復習</div>
       <div class="n"><span id="dueN">0</span><small>語</small></div>
@@ -449,13 +461,6 @@ section.view.on{display:block}
     <div class="panel">
       <h2>出題</h2>
       <div class="field">
-        <div><div class="k">1回の枚数</div><div class="h">1ラウンドで出す枚数</div></div>
-        <div class="seg" id="segRound">
-          <button data-v="10">10</button><button data-v="20">20</button>
-          <button data-v="30">30</button><button data-v="50">50</button>
-        </div>
-      </div>
-      <div class="field">
         <div><div class="k">出題の向き</div><div class="h">単語カードで最初に見せる面</div></div>
         <div class="seg" id="segDir">
           <button data-v="mix">両方</button><button data-v="k">韓→日</button><button data-v="j">日→韓</button>
@@ -565,8 +570,8 @@ let memOnly=false;
 function readLS(){ try{ return localStorage.getItem(KEY); }catch(e){ memOnly=true; return null; } }
 function writeLS(v){ try{ localStorage.setItem(KEY,v); }catch(e){ memOnly=true; } }
 
-const DEFCFG={ lessons:[1], pos:[], star:false, round:20, dir:'mix', rate:0.85, auto:true, theme:'auto', btn:3 };
-const DEF={ v:2, cards:{}, days:{}, pt:0, cfg:DEFCFG };
+const DEFCFG={ lessons:[1], pos:[], star:false, dir:'mix', rate:0.85, auto:true, theme:'auto', btn:3 };
+const DEF={ v:2, cards:{}, days:{}, pt:0, sess:null, cfg:DEFCFG };
 
 /* v1（レベル制）→ v2（SM-2）へのデータ移行。進捗と学習日は引き継ぐ */
 function migrate(s){
@@ -595,7 +600,11 @@ try{ ST=migrate(JSON.parse(readLS()||'null')); }catch(e){ ST=migrate(null); }
 writeLS(JSON.stringify(ST));   // 移行結果をすぐ確定させる
 
 let saveT=null;
-function save(){ clearTimeout(saveT); saveT=setTimeout(()=>writeLS(JSON.stringify(ST)),250); }
+function save(){ clearTimeout(saveT); saveT=setTimeout(flush,250); }
+function flush(){ clearTimeout(saveT); writeLS(JSON.stringify(ST)); }
+/* 他のアプリに切り替えた瞬間に書き込む。iOSはタブを予告なく破棄することがあるため */
+addEventListener('pagehide', flush);
+addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='hidden') flush(); });
 
 /* ---------- model ---------- */
 const DAY=864e5, MATURE=21;
@@ -765,6 +774,13 @@ function renderHome(){
   const s=streak(), st=$('#streak');
   st.classList.toggle('zero', s===0);
   st.innerHTML=icon('flame')+'<span class="num">'+s+'</span>日';
+
+  const sv=ST.sess, rest=sv?(sv.ids.length-sv.i):0;
+  $('#resumeBox').hidden = !(sv && rest>0);
+  if(sv && rest>0){
+    const md = sv.ro ? '今日の復習' : (sv.mode==='listen'?'聞き取り':'単語カード');
+    $('#resumeText').innerHTML = md+'の途中です。<br>残り <b>'+rest+'</b> 語（'+sv.ids.length+'語中 '+sv.i+'語おわり）';
+  }
 
   const p=pool();
   $('#poolInfo').textContent = !p.length ? '条件に合う単語がありません'
@@ -955,7 +971,6 @@ $$('[data-lf]').forEach(b=>b.onclick=()=>{
 
 /* ---------- settings ---------- */
 function renderSet(){
-  seg('#segRound', ST.cfg.round, v=>{ ST.cfg.round=+v; save(); renderSet(); });
   seg('#segDir', ST.cfg.dir, v=>{ ST.cfg.dir=v; save(); renderSet(); });
   seg('#segBtn', ST.cfg.btn, v=>{ ST.cfg.btn=+v; save(); renderSet(); });
   seg('#segRate', ST.cfg.rate, v=>{ ST.cfg.rate=+v; save(); renderSet(); speak('안녕하세요'); });
@@ -1014,33 +1029,55 @@ $$('.tabbar button').forEach(b=>b.onclick=()=>{
 
 /* ---------- session ---------- */
 let S=null, STAGE_HTML='';
+/* 出題範囲に入っている単語をすべて並べる。枚数の上限は設けない。
+   期日が来たもの → 未学習 → まだ期日でないもの（期日の近い順）の順。 */
 function buildQueue(reviewOnly){
   const src = reviewOnly ? WORDS : pool();
   const now=Date.now();
   const due=[], fresh=[], later=[];
   src.forEach(w=>{ const c=peek(w.i);
     if(c&&c.seen){ (c.due<=now?due:later).push(w); } else fresh.push(w); });
-  shuffle(due); shuffle(fresh); shuffle(later);
-  const q = reviewOnly ? due : due.concat(fresh, later);
-  return q.slice(0, ST.cfg.round);
+  shuffle(due); shuffle(fresh);
+  later.sort((a,b)=>peek(a.i).due-peek(b.i).due);
+  return reviewOnly ? due : due.concat(fresh, later);
 }
-function sideFor(){
-  if(S.mode==='listen') return 'a';
+function sideFor(mode){
+  if(mode==='listen') return 'a';
   if(ST.cfg.dir==='mix') return Math.random()<0.5?'k':'j';
   return ST.cfg.dir;
 }
-function start(mode, reviewOnly){
-  const q=buildQueue(reviewOnly);
-  if(!q.length){ tell('出題できる単語がありません。\n出題範囲の課や品詞を選び直してください。'); return; }
-  if(!ST.days[today()]) addPoints(30, 0);          // その日の初回セッションにボーナス
-  const before=level(ST.pt).lv;
-  S={mode, reviewOnly, list:q.map(w=>({w})), i:0, flip:false, ok:0, again:[], pt:0, lv0:before};
-  S.list.forEach(it=>it.side=sideFor());
+function openSession(){
   $('#answers').classList.toggle('three', ST.cfg.btn===3);
   $('#bEz').hidden = ST.cfg.btn!==3;
   $('#session').hidden=false;
   document.body.style.overflow='hidden';
   draw();
+}
+function start(mode, reviewOnly){
+  const q=buildQueue(reviewOnly);
+  if(!q.length){ tell('出題できる単語がありません。\n出題範囲の課や品詞を選び直してください。'); return; }
+  if(!ST.days[today()]) addPoints(30, 0);          // その日の初回セッションにボーナス
+  S={mode, reviewOnly, list:q.map(w=>({w, side:sideFor(mode)})), i:0, flip:false,
+     ok:0, again:[], pt:0, lv0:level(ST.pt).lv};
+  saveSess();
+  openSession();
+}
+/* 途中でやめても続きから戻れるように、並び順と現在地を保存しておく */
+function saveSess(){
+  if(!S || S.i>=S.list.length){ ST.sess=null; }
+  else ST.sess={ mode:S.mode, ro:S.reviewOnly, i:S.i, ok:S.ok, pt:S.pt, lv0:S.lv0,
+                 ids:S.list.map(x=>x.w.i), sides:S.list.map(x=>x.side),
+                 agn:S.again.map(w=>w.i), ts:Date.now() };
+  save();
+}
+function resumeSess(){
+  const s=ST.sess; if(!s) return;
+  const by=new Map(WORDS.map(w=>[w.i,w]));
+  const list=s.ids.map((id,k)=>({w:by.get(id), side:s.sides[k]})).filter(x=>x.w);
+  if(s.i>=list.length){ ST.sess=null; save(); renderHome(); return; }
+  S={mode:s.mode, reviewOnly:s.ro, list, i:s.i, flip:false, ok:s.ok, pt:s.pt,
+     lv0:s.lv0, again:(s.agn||[]).map(id=>by.get(id)).filter(Boolean)};
+  openSession();
 }
 function end(){
   $('#session').hidden=true; document.body.style.overflow='';
@@ -1092,9 +1129,11 @@ function answer(key){
   S.pt+=p; popPt(p);
   if(key==='again') S.again.push(it.w); else S.ok++;
   S.i++; S.flip=false;
+  saveSess();
   draw();
 }
 function result(){
+  ST.sess=null; save();                      // 一周し終えたので続きは残さない
   const total=S.list.length, ok=S.ok, ng=S.again.length;
   const pct=Math.round(ok/total*100), CIRC=2*Math.PI*52;
   const L=level(ST.pt), up=L.lv>S.lv0;
@@ -1106,24 +1145,23 @@ function result(){
       '<circle class="track" cx="60" cy="60" r="52"/>'+
       '<circle class="val" cx="60" cy="60" r="52" style="stroke-dasharray:'+CIRC+';stroke-dashoffset:'+CIRC+'"/>'+
     '</svg><div class="pct"><div><b>'+pct+'</b><span>%</span></div></div></div>'+
-    '<h2>ラウンド終了</h2>'+
+    '<h2>ひととおり終了</h2>'+
     '<div class="score">'+total+'語を学習しました</div>'+
     '<div class="gain">+'+S.pt+' pt</div>'+
     (up?'<div class="lvup">レベルアップ！ Lv.'+L.lv+' '+RANK(L.lv)+'</div>':'')+
     '<div class="nums"><div><b style="color:var(--ok)">'+ok+'</b><span>覚えた</span></div>'+
     '<div><b style="color:var(--no)">'+ng+'</b><span>まだ</span></div></div>'+
     (ng?'<button class="btn p" id="rAgain">「まだ」の'+ng+'語をもう一度</button>':'')+
-    '<button class="btn g" id="rNext">続けてもう'+ST.cfg.round+'語</button>'+
     '<button class="btn g" id="rHome">終わる</button></div>';
   requestAnimationFrame(()=>{ const v=st.querySelector('.val'); if(v) v.style.strokeDashoffset=CIRC*(1-ok/total); });
 
   const again=S.again.slice(), mode=S.mode, ro=S.reviewOnly;
   if(ng) $('#rAgain').onclick=()=>{
     restoreStage();
-    S={mode, reviewOnly:ro, list:shuffle(again).map(w=>({w})), i:0, flip:false, ok:0, again:[], pt:0, lv0:level(ST.pt).lv};
-    S.list.forEach(x=>x.side=sideFor()); draw();
+    S={mode, reviewOnly:ro, list:shuffle(again).map(w=>({w, side:sideFor(mode)})), i:0,
+       flip:false, ok:0, again:[], pt:0, lv0:level(ST.pt).lv};
+    saveSess(); draw();
   };
-  $('#rNext').onclick=()=>{ restoreStage(); start(mode, ro); };
   $('#rHome').onclick=()=>{ restoreStage(); end(); };
 }
 function restoreStage(){ $('#stage').innerHTML=STAGE_HTML; bindCard(); }
@@ -1162,7 +1200,7 @@ $('#bOk').onclick=()=>answer('good');
 $('#bEz').onclick=()=>answer('easy');
 $('#sClose').onclick=async()=>{
   if(S && S.i>0 && S.i<S.list.length){
-    if(!await ask('学習を終了しますか？\nここまでの記録とポイントは保存されています。','終了する')) return;
+    if(!await ask('ここでやめますか？\nここまでの記録とポイントは保存され、次に開いたときに「続きから再開」できます。','やめる')) return;
   }
   end();
 };
@@ -1183,6 +1221,11 @@ document.addEventListener('keydown',e=>{
 /* ---------- boot ---------- */
 $('#startReview').onclick=()=>start('cards', true);
 $$('.mode').forEach(b=>b.onclick=()=>start(b.dataset.mode, false));
+$('#btnResume').onclick=()=>resumeSess();
+$('#btnDrop').onclick=async()=>{
+  if(!await ask('途中の学習を捨てて、次は最初から並べ直しますか？\nここまで回答した分の記録は残ります。','捨てる',true)) return;
+  ST.sess=null; save(); renderHome();
+};
 function renderAll(){
   renderHome(); renderFilters(); renderList(); renderSet();
   if($('#v-rec').classList.contains('on')) renderRec();
