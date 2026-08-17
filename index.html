@@ -7,8 +7,8 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="まいにちハングル">
-<meta name="theme-color" content="#F1F3F7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0A0D14" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F6F3EC" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0C0B08" media="(prefers-color-scheme: dark)">
 <link rel="apple-touch-icon" sizes="180x180" href="icon.png?v=1">
 <link rel="icon" type="image/png" href="icon.png?v=1">
 </head>
@@ -16,36 +16,43 @@
 <title>まいにちハングル</title>
 
 <style>
+/* 配色は BABYMONSTER アサのイメージカラー（ファン間で定着しているイエロー）から。
+   YG系らしい黒とハイコントラストに組み、シルバーを「学習中」の状態色に当てている。
+   --accent は塗り用のビビッドイエロー、--accent-on は地の上に置く文字・線用。 */
 :root{
-  --bg:#F1F3F7; --card:#FFFFFF; --raise:#FFFFFF; --sunk:#E9ECF3;
-  --text:#101521; --sub:#697086; --line:#DDE2EC;
-  --accent:#0B4FA8; --accent-ink:#FFFFFF; --accent-soft:#E2EBF9;
-  --ok:#0E8A55; --ok-soft:#E0F2E9; --no:#C8102E; --no-soft:#FBE6EA; --star:#C98A16;
-  --shadow:0 1px 2px rgba(16,21,33,.05), 0 10px 28px rgba(16,21,33,.07);
+  --bg:#F6F3EC; --card:#FFFFFF; --raise:#FFFFFF; --sunk:#EBE6DA;
+  --text:#16130C; --sub:#78725F; --line:#E2DCCB;
+  --accent:#F2C31D; --accent-ink:#171205; --accent-on:#7A5A05; --accent-soft:#FBEFC4;
+  --ok:#3E7A55; --ok-soft:#E4EFE6; --no:#B0392F; --no-soft:#F9E7E2;
+  --star:#B07C08; --learn:#9A9280;
+  --shadow:0 1px 2px rgba(30,24,8,.06), 0 10px 28px rgba(30,24,8,.09);
   --radius:18px;
 }
 @media (prefers-color-scheme: dark){
   :root{
-    --bg:#0A0D14; --card:#151A24; --raise:#1D2430; --sunk:#0F141D;
-    --text:#EDF1F7; --sub:#8D97AC; --line:#28303D;
-    --accent:#78ABF5; --accent-ink:#08111F; --accent-soft:#16263D;
-    --ok:#4ECB8E; --ok-soft:#10291D; --no:#FF7285; --no-soft:#2E1319; --star:#E5B33D;
-    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px rgba(0,0,0,.45);
+    --bg:#0C0B08; --card:#181610; --raise:#221F16; --sunk:#110F0A;
+    --text:#F3EFE2; --sub:#9A9482; --line:#302C20;
+    --accent:#F5CE3A; --accent-ink:#141003; --accent-on:#F5CE3A; --accent-soft:#2E2508;
+    --ok:#5FC38C; --ok-soft:#12291C; --no:#F0736A; --no-soft:#2E1512;
+    --star:#F5CE3A; --learn:#8C8672;
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 28px rgba(0,0,0,.55);
   }
 }
 :root[data-theme="light"]{
-  --bg:#F1F3F7; --card:#FFFFFF; --raise:#FFFFFF; --sunk:#E9ECF3;
-  --text:#101521; --sub:#697086; --line:#DDE2EC;
-  --accent:#0B4FA8; --accent-ink:#FFFFFF; --accent-soft:#E2EBF9;
-  --ok:#0E8A55; --ok-soft:#E0F2E9; --no:#C8102E; --no-soft:#FBE6EA; --star:#C98A16;
-  --shadow:0 1px 2px rgba(16,21,33,.05), 0 10px 28px rgba(16,21,33,.07);
+  --bg:#F6F3EC; --card:#FFFFFF; --raise:#FFFFFF; --sunk:#EBE6DA;
+  --text:#16130C; --sub:#78725F; --line:#E2DCCB;
+  --accent:#F2C31D; --accent-ink:#171205; --accent-on:#7A5A05; --accent-soft:#FBEFC4;
+  --ok:#3E7A55; --ok-soft:#E4EFE6; --no:#B0392F; --no-soft:#F9E7E2;
+  --star:#B07C08; --learn:#9A9280;
+  --shadow:0 1px 2px rgba(30,24,8,.06), 0 10px 28px rgba(30,24,8,.09);
 }
 :root[data-theme="dark"]{
-  --bg:#0A0D14; --card:#151A24; --raise:#1D2430; --sunk:#0F141D;
-  --text:#EDF1F7; --sub:#8D97AC; --line:#28303D;
-  --accent:#78ABF5; --accent-ink:#08111F; --accent-soft:#16263D;
-  --ok:#4ECB8E; --ok-soft:#10291D; --no:#FF7285; --no-soft:#2E1319; --star:#E5B33D;
-  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px rgba(0,0,0,.45);
+  --bg:#0C0B08; --card:#181610; --raise:#221F16; --sunk:#110F0A;
+  --text:#F3EFE2; --sub:#9A9482; --line:#302C20;
+  --accent:#F5CE3A; --accent-ink:#141003; --accent-on:#F5CE3A; --accent-soft:#2E2508;
+  --ok:#5FC38C; --ok-soft:#12291C; --no:#F0736A; --no-soft:#2E1512;
+  --star:#F5CE3A; --learn:#8C8672;
+  --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 28px rgba(0,0,0,.55);
 }
 
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
@@ -55,7 +62,7 @@ body{
   -webkit-font-smoothing:antialiased; overscroll-behavior-y:none;
 }
 button{font:inherit; color:inherit; background:none; border:none; padding:0; cursor:pointer}
-button:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:8px}
+button:focus-visible{outline:2px solid var(--accent-on); outline-offset:2px; border-radius:8px}
 h1,h2,h3{margin:0; font-weight:700}
 .num{font-variant-numeric:tabular-nums}
 @media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important} }
@@ -110,7 +117,7 @@ section.view.on{display:block}
 
 .modes{display:grid; grid-template-columns:1fr 1fr; gap:10px}
 .mode{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:15px 14px; text-align:left; box-shadow:var(--shadow)}
-.mode .ic{font-size:23px; color:var(--accent); margin-bottom:9px}
+.mode .ic{font-size:23px; color:var(--accent-on); margin-bottom:9px}
 .mode .t{font-weight:700; font-size:15px; display:block}
 .mode .d{font-size:11.5px; color:var(--sub); margin-top:4px; line-height:1.5}
 .mode:active{transform:scale(.98)}
@@ -119,9 +126,9 @@ section.view.on{display:block}
 .chips{display:flex; flex-wrap:wrap; gap:7px}
 .chip{border:1px solid var(--line); background:var(--raise); border-radius:999px; padding:7px 13px; font-size:13px; font-weight:600; color:var(--sub)}
 .chip.on{background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
-.chip.lite.on{background:var(--accent-soft); color:var(--accent); border-color:var(--accent)}
+.chip.lite.on{background:var(--accent-soft); color:var(--accent-on); border-color:var(--accent-on)}
 .rowbtns{display:flex; gap:8px; margin-bottom:11px}
-.rowbtns button{font-size:12px; font-weight:700; color:var(--accent); padding:5px 11px; border:1px solid var(--line); border-radius:999px}
+.rowbtns button{font-size:12px; font-weight:700; color:var(--accent-on); padding:5px 11px; border:1px solid var(--line); border-radius:999px}
 
 .field{display:flex; align-items:center; justify-content:space-between; padding:13px 0; border-bottom:1px solid var(--line); gap:12px}
 .field:first-of-type{padding-top:0}
@@ -157,12 +164,12 @@ section.view.on{display:block}
 .calhead button:disabled{opacity:.3}
 .cal{display:grid; grid-template-columns:repeat(7,1fr); gap:5px}
 .cal .wd{text-align:center; font-size:10.5px; font-weight:700; color:var(--sub); padding-bottom:3px}
-.cal .wd.s0{color:var(--no)} .cal .wd.s6{color:var(--accent)}
+.cal .wd.s0{color:var(--no)} .cal .wd.s6{color:var(--accent-on)}
 .cal .d{aspect-ratio:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px;
   border-radius:10px; font-size:12px; font-weight:600; color:var(--sub); font-variant-numeric:tabular-nums}
 .cal .d.pad{visibility:hidden}
 .cal .d.l1{background:color-mix(in srgb, var(--accent) 22%, transparent); color:var(--text)}
-.cal .d.l2{background:color-mix(in srgb, var(--accent) 58%, transparent); color:#fff}
+.cal .d.l2{background:color-mix(in srgb, var(--accent) 58%, transparent); color:var(--text)}
 .cal .d.l3{background:var(--accent); color:var(--accent-ink)}
 .cal .d.today{box-shadow:inset 0 0 0 2px var(--star)}
 .cal .ck{width:11px; height:11px; stroke:currentColor; stroke-width:3.2; fill:none; stroke-linecap:round; stroke-linejoin:round}
@@ -180,10 +187,10 @@ section.view.on{display:block}
 .chart{width:100%; display:block; overflow:visible}
 .chart .grid{stroke:var(--line); stroke-width:1}
 .chart .axis{fill:var(--sub); font-size:9px; font-weight:600}
-.chart .curve{fill:none; stroke:var(--accent); stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round}
-.chart .area{fill:var(--accent); opacity:.12}
+.chart .curve{fill:none; stroke:var(--accent-on); stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round}
+.chart .area{fill:var(--accent-on); opacity:.14}
 .chart .ref{stroke:var(--star); stroke-width:1.5; stroke-dasharray:3 3}
-.chart .barr{fill:var(--accent); rx:2}
+.chart .barr{fill:var(--accent-on); rx:2}
 .chart .barr.past{fill:var(--no)}
 
 .search{width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--line); background:var(--card); color:var(--text); font-size:16px; margin-bottom:11px}
@@ -207,7 +214,7 @@ section.view.on{display:block}
 }
 .tabbar button{flex:1; padding:9px 0 7px; display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--sub); font-size:10.5px; font-weight:600}
 .tabbar button .ic{font-size:21px}
-.tabbar button.on{color:var(--accent)}
+.tabbar button.on{color:var(--accent-on)}
 
 /* ===== session ===== */
 .session{
@@ -238,7 +245,7 @@ section.view.on{display:block}
 .face .big.ja{font-size:29px; font-weight:700}
 .face .sm{font-size:17px; color:var(--sub); margin-top:15px; line-height:1.55; font-weight:500; text-wrap:balance}
 .face .hint{font-size:11.5px; color:var(--sub); margin-top:22px; opacity:.8}
-.playbig{width:112px; height:112px; border-radius:50%; background:var(--accent-soft); color:var(--accent); font-size:42px; display:grid; place-items:center; margin:0 auto}
+.playbig{width:112px; height:112px; border-radius:50%; background:var(--accent-soft); color:var(--accent-on); font-size:42px; display:grid; place-items:center; margin:0 auto}
 .playbig.on{animation:pulse .7s ease}
 @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.09)}100%{transform:scale(1)}}
 .judge{position:absolute; top:20px; font-size:15px; font-weight:800; padding:7px 15px; border-radius:10px; opacity:0}
@@ -254,7 +261,7 @@ section.view.on{display:block}
 .answers button .nx{display:block; font-size:10.5px; font-weight:600; opacity:.75; margin-top:3px; font-variant-numeric:tabular-nums}
 .answers .ng{background:var(--no-soft); color:var(--no)}
 .answers .okb{background:var(--ok-soft); color:var(--ok)}
-.answers .ez{background:var(--accent-soft); color:var(--accent)}
+.answers .ez{background:var(--accent-soft); color:var(--accent-on)}
 .answers button:active{transform:scale(.97)}
 
 .result{text-align:center; padding:10px 0}
@@ -268,8 +275,8 @@ section.view.on{display:block}
 .ring .pct span{font-size:15px; font-weight:600; color:var(--sub); margin-left:2px}
 .result h2{font-size:21px; margin:14px 0 6px}
 .result .score{font-size:13.5px; color:var(--sub); margin-bottom:16px}
-.result .gain{display:inline-block; background:var(--accent-soft); color:var(--accent); font-size:15px; font-weight:800; padding:9px 18px; border-radius:999px; margin-bottom:18px; font-variant-numeric:tabular-nums}
-.result .lvup{background:var(--star); color:#1a1200; border-radius:14px; padding:13px; font-weight:800; font-size:15px; margin-bottom:18px}
+.result .gain{display:inline-block; background:var(--accent-soft); color:var(--accent-on); font-size:15px; font-weight:800; padding:9px 18px; border-radius:999px; margin-bottom:18px; font-variant-numeric:tabular-nums}
+.result .lvup{background:var(--accent); color:var(--accent-ink); border-radius:14px; padding:13px; font-weight:800; font-size:15px; margin-bottom:18px}
 .result .nums{display:flex; justify-content:center; gap:26px; margin:0 0 22px}
 .result .nums div{text-align:center}
 .result .nums b{display:block; font-size:28px; font-weight:800; font-variant-numeric:tabular-nums}
@@ -353,12 +360,12 @@ section.view.on{display:block}
       <h2>進捗</h2>
       <div class="bar">
         <i id="pgDone" style="background:var(--ok)"></i>
-        <i id="pgLearn" style="background:var(--star)"></i>
+        <i id="pgLearn" style="background:var(--learn)"></i>
         <i id="pgNew" style="background:var(--sunk)"></i>
       </div>
       <div class="legend">
         <span><i class="dot" style="background:var(--ok)"></i>習得済み <b id="cDone">0</b></span>
-        <span><i class="dot" style="background:var(--star)"></i>学習中 <b id="cLearn">0</b></span>
+        <span><i class="dot" style="background:var(--learn)"></i>学習中 <b id="cLearn">0</b></span>
         <span><i class="dot" style="background:var(--line)"></i>未学習 <b id="cNew">0</b></span>
       </div>
       <div class="note">復習間隔が21日以上まで伸びた単語を「習得済み」としています。</div>
@@ -900,7 +907,7 @@ function renderForget(){
   let lab='';
   [0,7,14,21,30].forEach(d=>{ lab+='<text class="axis" x="'+X(d)+'" y="'+(H-5)+'" text-anchor="middle">'+(d?d+'日':'今日')+'</text>'; });
   svg.innerHTML=g+'<path class="area" d="'+area+'"/><path class="curve" d="'+line+'"/>'+lab+
-    '<circle cx="'+X(0)+'" cy="'+Y(pts[0])+'" r="3.5" fill="var(--accent)"/>';
+    '<circle cx="'+X(0)+'" cy="'+Y(pts[0])+'" r="3.5" fill="var(--accent-on)"/>';
 }
 function renderDue(){
   const svg=$('#chDue'), W=320,H=110, PL=22,PR=6,PT=8,PB=18, N=14;
@@ -942,7 +949,7 @@ function renderList(){
   if(!arr.length){ box.innerHTML='<div class="empty">該当する単語がありません</div>'; $('#more').hidden=true; return; }
   arr.slice(0,shown).forEach(w=>{
     const c=peek(w.i), b=bucket(w.i);
-    const col=b==='done'?'var(--ok)':b==='learn'?'var(--star)':'var(--line)';
+    const col=b==='done'?'var(--ok)':b==='learn'?'var(--learn)':'var(--line)';
     const el=document.createElement('div'); el.className='w';
     const meta = c&&c.seen ? '次回 '+ivText(c.iv) : (w.m||'');
     el.innerHTML='<i class="dot" style="background:'+col+'"></i>'+
