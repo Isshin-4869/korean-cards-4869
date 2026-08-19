@@ -510,6 +510,27 @@ section.view.on{display:block}
     </div>
 
     <div class="panel">
+      <h2>ウィジェット連携</h2>
+      <div class="note" style="margin-top:0;margin-bottom:12px">
+        iPhoneのウィジェットに「今日の復習・連続日数・レベル」を出すための設定です。
+        使わないなら空のままで大丈夫です。
+      </div>
+      <input class="search" id="wurl" placeholder="https://○○○.workers.dev" autocomplete="off"
+             spellcheck="false" autocapitalize="off" style="margin-bottom:4px">
+      <div class="field" id="wlinkRow" hidden>
+        <div style="min-width:0">
+          <div class="k">ウィジェットに貼るURL</div>
+          <div class="h" id="wlink" style="word-break:break-all"></div>
+        </div>
+        <button class="chip" id="wcopy">コピー</button>
+      </div>
+      <div class="field">
+        <div><div class="k">送信</div><div class="h" id="wsent">まだ送信していません</div></div>
+        <button class="chip" id="wnow">今すぐ送信</button>
+      </div>
+    </div>
+
+    <div class="panel">
       <h2>データ</h2>
       <div style="font-size:12.5px;color:var(--sub);line-height:1.75;margin-bottom:13px" id="dataInfo">—</div>
       <button class="btn g" id="backup">進捗をバックアップ（書き出し）</button>
@@ -577,7 +598,8 @@ let memOnly=false;
 function readLS(){ try{ return localStorage.getItem(KEY); }catch(e){ memOnly=true; return null; } }
 function writeLS(v){ try{ localStorage.setItem(KEY,v); }catch(e){ memOnly=true; } }
 
-const DEFCFG={ lessons:[1], pos:[], star:false, dir:'mix', rate:0.85, auto:true, theme:'auto', btn:3 };
+const DEFCFG={ lessons:[1], pos:[], star:false, dir:'mix', rate:0.85, auto:true, theme:'auto', btn:3,
+               wurl:'', wid:'' };
 const DEF={ v:2, cards:{}, days:{}, pt:0, sess:null, cfg:DEFCFG };
 
 /* v1（レベル制）→ v2（SM-2）へのデータ移行。進捗と学習日は引き継ぐ */
@@ -983,6 +1005,8 @@ function renderSet(){
   seg('#segRate', ST.cfg.rate, v=>{ ST.cfg.rate=+v; save(); renderSet(); speak('안녕하세요'); });
   seg('#segTheme', ST.cfg.theme, v=>{ ST.cfg.theme=v; save(); applyTheme(); renderSet(); });
   sw($('#swAuto'), ST.cfg.auto, v=>{ ST.cfg.auto=v; save(); renderSet(); });
+  if(document.activeElement!==$('#wurl')) $('#wurl').value=ST.cfg.wurl||'';
+  renderWidgetRow();
   const cards=Object.values(ST.cards);
   const studied=cards.filter(c=>c.seen).length, starred=cards.filter(c=>c.st).length;
   const L=level(ST.pt);
@@ -991,6 +1015,65 @@ function renderSet(){
     +'学習した日数 '+Object.keys(ST.days).length+' 日　連続 '+streak()+' 日'
     + (memOnly?'<br><b style="color:var(--no)">このブラウザでは進捗を保存できません</b>':'');
 }
+/* ---------- ウィジェット連携 ----------
+   Cloudflare Worker に要約だけを置き、Scriptable のウィジェットがそれを読む。
+   期日は一覧で送るので、次に送信するまでの間もウィジェット側で数え直せる。 */
+function randId(){
+  const a=new Uint8Array(8); crypto.getRandomValues(a);
+  return [...a].map(b=>('0'+b.toString(16)).slice(-2)).join('');
+}
+function widgetURL(){
+  const base=(ST.cfg.wurl||'').trim().replace(/\/+$/,'');
+  return (base && ST.cfg.wid) ? base+'/'+ST.cfg.wid : '';
+}
+function widgetPayload(){
+  const n={new:0,learn:0,done:0};
+  WORDS.forEach(w=>n[bucket(w.i)]++);
+  const d=[];
+  for(const id in ST.cards){ const c=ST.cards[id]; if(c.seen) d.push(Math.round(c.due/1000)); }
+  d.sort((a,b)=>a-b);
+  const L=level(ST.pt);
+  return { v:1, ts:Math.round(Date.now()/1000), lv:L.lv, rank:RANK(L.lv), pt:ST.pt,
+           lvCur:L.cur, lvNeed:L.need, streak:streak(),
+           lastDay:Object.keys(ST.days).sort().pop()||'',
+           done:n.done, learn:n.learn, fresh:n.new, total:WORDS.length, d:d };
+}
+async function pushWidget(){
+  const u=widgetURL(); if(!u) return false;
+  try{
+    const r=await fetch(u,{method:'PUT',headers:{'Content-Type':'application/json'},
+                          body:JSON.stringify(widgetPayload())});
+    if(!r.ok) return false;
+    ST.wsent=Date.now(); save(); return true;
+  }catch(e){ return false; }
+}
+function renderWidgetRow(){
+  const u=widgetURL();
+  $('#wlinkRow').hidden=!u;
+  $('#wlink').textContent=u;
+  const t=ST.wsent;
+  $('#wsent').textContent = !u ? 'URLを貼ると使えます'
+    : t ? ('最後の送信 '+new Date(t).toLocaleString('ja-JP',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}))
+        : 'まだ送信していません';
+}
+$('#wurl').oninput=()=>{
+  ST.cfg.wurl=$('#wurl').value.trim();
+  if(ST.cfg.wurl && !ST.cfg.wid) ST.cfg.wid=randId();
+  save(); renderWidgetRow();
+};
+$('#wcopy').onclick=async()=>{
+  const u=widgetURL();
+  try{ await navigator.clipboard.writeText(u); tell('コピーしました'); }
+  catch(e){ tell('長押しでコピーしてください:\n'+u); }
+};
+$('#wnow').onclick=async()=>{
+  if(!widgetURL()){ tell('先に Worker の URL を貼ってください。'); return; }
+  const ok=await pushWidget();
+  renderWidgetRow();
+  tell(ok ? '送信しました。ウィジェットに反映されます。'
+          : '送信できませんでした。\nURLが正しいか、Workerが動いているか確認してください。');
+};
+
 function applyTheme(){
   const t=ST.cfg.theme;
   if(t==='auto') document.documentElement.removeAttribute('data-theme');
@@ -1088,7 +1171,7 @@ function resumeSess(){
 }
 function end(){
   $('#session').hidden=true; document.body.style.overflow='';
-  S=null; renderAll();
+  S=null; renderAll(); pushWidget();
 }
 function draw(){
   const it=S.list[S.i];
@@ -1241,6 +1324,7 @@ STAGE_HTML=$('#stage').innerHTML;
 bindCard();
 applyTheme();
 renderAll();
+pushWidget();
 </script>
 
 </body>
